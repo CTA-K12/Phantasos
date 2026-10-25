@@ -36,3 +36,8 @@
 
 # Odds and Ends
 last_alert_email.txt
+
+# Migration tooling venv
+/.venv/
+
+.memsearch
