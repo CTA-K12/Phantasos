@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Events>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "6ac7ded8ae2adc04653a35a5"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "294384",
+      "content-type": "application/pdf",
+      "last-modified": "Thu, 08 Oct 2026 18:20:08 GMT"
+    },
+    "status": 200
+  }
+}

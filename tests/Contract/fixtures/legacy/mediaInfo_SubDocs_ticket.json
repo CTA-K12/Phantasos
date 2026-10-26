@@ -1,0 +1,30 @@
+{
+  "request": {
+    "key": "<key:SubDocs>",
+    "method": "GET",
+    "params": {
+      "media_id": "644857c7ae2adc3a44a0b32c"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "149",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [],
+      "original_exists": null,
+      "owner": "SubDocs",
+      "processing_percentage": 0,
+      "ready": false,
+      "security": [],
+      "status": "In queue",
+      "tags": [],
+      "type": null
+    },
+    "raw": "{\"owner\":\"SubDocs\",\"type\":null,\"original_exists\":null,\"tags\":[],\"security\":[],\"files\":[],\"ready\":false,\"status\":\"In queue\",\"processing_percentage\":0}",
+    "status": 200
+  }
+}

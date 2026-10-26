@@ -1,0 +1,30 @@
+{
+  "request": {
+    "key": "<key:Events>",
+    "method": "GET",
+    "params": {
+      "media_id": "6aa84308ae2adc88070048e1"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "148",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [],
+      "original_exists": null,
+      "owner": "Events",
+      "processing_percentage": 0,
+      "ready": false,
+      "security": [],
+      "status": "In queue",
+      "tags": [],
+      "type": null
+    },
+    "raw": "{\"owner\":\"Events\",\"type\":null,\"original_exists\":null,\"tags\":[],\"security\":[],\"files\":[],\"ready\":false,\"status\":\"In queue\",\"processing_percentage\":0}",
+    "status": 200
+  }
+}

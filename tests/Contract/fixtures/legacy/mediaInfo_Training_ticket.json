@@ -1,0 +1,30 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "6a3437b4ae2adc18612e180a"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "150",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [],
+      "original_exists": null,
+      "owner": "Training",
+      "processing_percentage": 0,
+      "ready": false,
+      "security": [],
+      "status": "In queue",
+      "tags": [],
+      "type": null
+    },
+    "raw": "{\"owner\":\"Training\",\"type\":null,\"original_exists\":null,\"tags\":[],\"security\":[],\"files\":[],\"ready\":false,\"status\":\"In queue\",\"processing_percentage\":0}",
+    "status": 200
+  }
+}

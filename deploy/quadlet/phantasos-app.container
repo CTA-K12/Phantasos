@@ -1,0 +1,27 @@
+# PHP-FPM: the API and admin UI. Not published; nginx connects on phantasos:9001.
+#
+# Install: copy deploy/quadlet/* to /etc/containers/systemd/, set the image tag,
+# then `systemctl daemon-reload && systemctl start phantasos-web` (pulls the others in).
+[Unit]
+Description=Phantasos PHP-FPM
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=phantasos-app
+Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-app:TAG
+Network=phantasos.network
+EnvironmentFile=/etc/phantasos/phantasos.env
+# Media store (LUKS volume). SELinux labels are set once on the host with
+# `semanage fcontext` + restorecon; never use :Z/:z here (it would relabel 100+ GB).
+Volume=/media:/media
+NoNewPrivileges=true
+DropCapability=ALL
+LogDriver=journald
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

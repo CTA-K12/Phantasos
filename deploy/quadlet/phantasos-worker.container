@@ -1,0 +1,26 @@
+# Messenger worker: runs the image/audio/video processors (ffmpeg) and callbacks.
+# Exits hourly (--time-limit) and systemd restarts it, releasing memory.
+[Unit]
+Description=Phantasos media processing worker
+After=network-online.target
+Wants=network-online.target
+
+[Container]
+ContainerName=phantasos-worker
+Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-app:TAG
+Network=phantasos.network
+EnvironmentFile=/etc/phantasos/phantasos.env
+Volume=/media:/media
+Exec=php bin/console messenger:consume async --time-limit=3600 --memory-limit=768M
+NoNewPrivileges=true
+DropCapability=ALL
+LogDriver=journald
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+# Let an in-progress encode finish its message before stopping (Messenger handles SIGTERM).
+TimeoutStopSec=600
+
+[Install]
+WantedBy=multi-user.target

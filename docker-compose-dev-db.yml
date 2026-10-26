@@ -4,7 +4,8 @@
 #   docker compose -f docker-compose-dev-db.yml down      stop (data kept)
 #
 # The test suite uses the same server with a `_test` database-name suffix
-# (config/packages/doctrine.yaml, when@test).
+# (config/packages/doctrine.yaml, when@test), so imported legacy data in the dev
+# database never collides with test rows.
 #
 # Port 5448 — this machine's other projects already use 5433–5446 for their local
 # databases; a collision would silently point one project at another's schema.

@@ -22,6 +22,8 @@ class AuditLogger
         'export.csv'              => 'CSV Export',
         'admin.setting_changed'   => 'Admin Setting Changed',
         'data.purged'             => 'Data Purged',
+        'media.served'            => 'Media File Served',
+        'media.uploaded'          => 'Media Uploaded',
     ];
 
     public function __construct(

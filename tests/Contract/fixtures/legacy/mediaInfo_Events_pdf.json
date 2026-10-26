@@ -1,0 +1,37 @@
+{
+  "request": {
+    "key": "<key:Events>",
+    "method": "GET",
+    "params": {
+      "media_id": "6ac7ded7ae2adc02653a35a5"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "262",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "application/pdf",
+          "file_name": "original.pdf",
+          "media_file_id": "6ac7ded8ae2adc04653a35a5",
+          "size": []
+        }
+      ],
+      "original_exists": true,
+      "owner": "Events",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "pdf"
+    },
+    "raw": "{\"owner\":\"Events\",\"type\":\"pdf\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.pdf\",\"content_type\":\"application\\/pdf\",\"media_file_id\":\"6ac7ded8ae2adc04653a35a5\",\"size\":[]}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

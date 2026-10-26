@@ -58,72 +58,61 @@ Status keys: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` needs decisi
 ## ⚠️ Priority: migrate ASAP
 Old server (PHP 5.6.8) is exposed to an unpatchable PHP RCE class of vuln. **No code fixes on the old
 system** — all hardening (ownership check, header-based keys, CORS) goes into the new system.
-- [ ] **Execute purge** (after backup decision): `delete_files.sh delete` on server, then
-      `purge_app.py --apply` for Mongo docs.
-- [ ] **Verify**: `inspect_db.py` shows ORSkills media/mediaFile = 0; spot-check leaf dirs gone.
 
-## Phase 2 — Dependency / runtime modernization
+## Rebuild (Symfony 7.4 / PostgreSQL / Messenger) — see AI.md §13–14
 
-- [ ] **MongoDB driver**: replace legacy `ext-mongo` path. Target **Doctrine MongoDB ODM 2.x +
-      `ext-mongodb` + `mongodb/mongodb`** (required for PHP 8 + modern Mongo). (AI.md §6.)
-- [ ] **Mongo mappings**: convert `@MongoDB\String/Int/Boolean` annotations → ODM 2.x
-      attributes/`#[Field(...)]`. Re-map `Media`, `MediaFile`, `ApiUserDocument`.
-- [ ] **PHP 8.x**: get `composer install` working locally (MacBook has PHP 8.5.6) on the new stack.
-- [ ] **Replace abandoned libs**: `phpoffice/phpexcel` → `phpoffice/phpspreadsheet`; check
-      `imagine`, `dompdf`, `php-ffmpeg`, `guzzle` for current majors.
-- [ ] **Queue payload**: move RabbitMQ message from PHP `serialize()` to JSON.
+Done 2026-10-25 (working tree on `php8_upgrade`):
+- [x] Starter scaffold; dependencies updated (composer audit clean).
+- [x] Schema: `api_client` (SHA-256 keys), `media`, `media_file` (`position`), `messenger_messages`.
+- [x] API: the four endpoints, API-key authenticator (header/query/form), ownership on every read.
+- [x] Contract fixtures captured from the legacy server; byte-identical replay tests.
+- [x] Processors: image, pdf, audio (mp3), video (frame + mp4); Messenger worker; callbacks
+      (incl. legacy scheme-less URLs).
+- [x] Mongo→PG import (`migration/import_to_pg.py`); 39,486 media / 43,350 files; local + **prod
+      rehearsal** done. Live parity check 150/150 identical.
+- [x] prod DB `phantasos` on appdev-pg-prod: schema migrated; all tables pg_tde-encrypted.
+- [x] Containers (`app`, `web`) + nginx (X-Accel, upload streaming, no query-string logging);
+      local end-to-end smoke test passed. Quadlet units in `deploy/quadlet/`.
 
-## Phase 3 — Symfony upgrade (2.6 → current LTS)
+Open:
+- [?] **Word/Excel processors**: not built (0 such media in current data; Office parsers are a CVE
+      magnet). Uploads of those types now get 400. Decide: keep unsupported, or add them.
+- [ ] Admin UI: port layout/help panel from ORMed2/healthed-training (Pico); key management
+      (create/rotate/deactivate, per-environment keys), media browser, failed-queue view.
+- [ ] Phantasos Google OAuth client (admin UI); restrict admin UI to internal networks.
+- [ ] Build/push script for Harbor (`appdev-phi`), image tags; Trivy scan clean.
+- [ ] Retention for `audit_log` (`media.served` ≈ 7k rows/day) and `messenger_messages` failed queue.
+- [ ] Monitoring: worker liveness, failed-message count, disk usage on /media.
 
-- [ ] Scaffold a current **Symfony LTS** (6.4/7.x) skeleton (flex), migrate `src/` bundles into it.
-- [ ] Replace **`security.context`** usage with `Security`/`token_storage` in `ApiController`.
-- [ ] Port the **TyHand API-key auth** to the new Security authenticator system.
-- [ ] Port **routing/controllers** to PHP attributes; `Controller` → `AbstractController`.
-- [ ] Port **RabbitMQ integration** (oldsound bundle is unmaintained for new Symfony — evaluate
-      `php-amqplib` directly or Symfony Messenger + AMQP transport).
-- [ ] Re-wire `services.yml`, config, monolog (mail handler), swiftmailer → **symfony/mailer**.
-- [ ] **Centralize/clean CORS** (kill the duplicated hardcoded headers; use a real CORS policy).
-- [ ] Revisit/replace the `pcntl_fork` processor runner (Messenger workers / k8s replicas).
+## Host & cutover (phantasos.apps.cascadetech.org, .21)
 
-## Phase 4 — Infrastructure migration
+Handoff to the cluster/infra side (details in AI.md §14 "Host prerequisites"):
+- [ ] LUKS on `/media` (while empty); SELinux fcontext for `/media` (no `:Z`).
+- [ ] Podman + Quadlet; Harbor robot login.
+- [ ] Let's Encrypt (Route53 DNS-01) for both names → `/etc/phantasos/tls/`; renewal reload hook.
+      Confirm Route53 hosts `mesd.k12.or.us`.
+- [ ] `/etc/phantasos/phantasos.env` (mode 600) from `deploy/phantasos.env.example`; fresh APP_SECRET.
+- [ ] Firewall: 443/80 public; pg access from .21 to appdev-pg-prod.
+- [ ] Remove MongoDB from the cluster repo's Phase 17.
+- [ ] rsync old→new `/media/phantasos` (`--chown=65534:65534`), nightly `/media` backup.
 
-- [ ] **RabbitMQ → Kubernetes** (replace the 3 appdev-video VMs). Decide cluster operator
-      (e.g. RabbitMQ Cluster Operator) + persistence.
-- [ ] **Processor workers → k8s** (containerize ffmpeg + consumer; scale via replicas).
-- [ ] **API/web app → k8s** (containerize; ingress; config via env/secrets — rotate prod secrets).
-- [ ] **MongoDB**: provision new home per Phase-0 decision; migrate data; cut over.
-- [x] **Storage architecture decided** (2026-06-01): **local storage on Rocky box + NFS to k8s
-      pods** (not Longhorn RWX / not cloud object storage). See AI.md §11. ePHI/HIPAA in play.
-- [ ] **New storage server**: provision Rocky 10; migrate `/media/phantasos` (post-purge ~110 G,
-      growing to ~1 TB) off the failing MD3200i; **NFS mount into BOTH API and worker pods**.
-- [ ] **HIPAA — at rest**: LUKS on `/media`; LUKS on Mongo data dir + mongodump backups.
-- [ ] **HIPAA — in transit (CHOSEN: WireGuard)**: WG tunnel worker-nodes↔phantasos, NFS bound to
-      wg0 only (NFSv4.2). WG e.g. 10.66.0.0/24 (verify no Cilium CIDR clash); peers = workers
-      .3/.4/.5; firewalld 51820/udp from 198.236.76.0/28 + NFS only on wg0; k8s PV server=10.66.0.1;
-      wg-quick before kubelet. (Alt: NFSv4.2 RPC-over-TLS.) Plus TLS on mongod + API.
-- [~] **HIPAA — audit logging**: owned by **ORMed**, not Phantasos. Confirm ORMed proxies media
-      server-side (not browser-direct), lock Phantasos API access to ORMed pods (CiliumNetworkPolicy
-      egress + phantasos firewall to k8s subnet), ORMed media = hideToOthers:true.
-- [ ] **ORMed onboarding** (not yet in Phantasos; being rebuilt): provision a NEW api key under its
-      final renamed name when added — no data migration. (`ORMed Training` = different, non-ePHI.)
-- [ ] **HIPAA — tenancy decision**: dedicated Phantasos instance+volume+Mongo for the ePHI app vs.
-      multi-tenant (affects compliance scope).
-- [ ] **HIPAA — availability**: storage HA/replication + tested restore (contingency plan).
-- [ ] **HIPAA — sign-off**: security/compliance officer owns the risk assessment.
-- [ ] **Secrets**: rotate Mongo/RabbitMQ/mailer/app-secret; move to k8s secrets. (AI.md §8.)
+Test on `phantasos.apps.cascadetech.org` (test writes are disposable), then cutover:
+- [ ] Stop the old web server.
+- [ ] Final `rsync --delete` + `import_to_pg.py --target prod --apply` (full re-import).
+- [ ] DNS flip `phantasos.mesd.k12.or.us` → .21.
+- [ ] Monitor 1 h: consumer traffic (Training, HealthEd MESD/NWRESD, SubDocs, DocGuard when on),
+      worker queue, callbacks to SubDocs.
+- [ ] Decommission old host, MD3200i, appdev-video1/2/3; remove RabbitMQ.
 
-## Phase 5 — Cutover & validation
-
-- [ ] End-to-end test in sandbox: upload (image/pdf/doc/audio/video) → process → mediaInfo →
-      requestMedia, for each consuming app's key.
-- [ ] Verify callbacks still reach consuming apps.
-- [ ] Plan cutover window; DNS/ingress switch; keep old stack as rollback until verified.
-- [ ] Decommission old phantasos host + MD3200i + appdev-video VMs after stable.
-
----
+## HIPAA / ePHI (before ORMed onboarding)
+- [x] Storage decision: local storage on the Rocky box (AI.md §11).
+- [ ] LUKS on `/media` + encrypted backups; PG already pg_tde.
+- [ ] Tenancy decision for ORMed (dedicated instance vs multi-tenant).
+- [ ] ORMed key under its final name; ORMed proxies media server-side.
+- [ ] Availability: tested restore; risk assessment sign-off.
 
 ## Backlog / nice-to-have
-- [ ] Re-enable `.docx` processing (currently disabled due to an unresolved bug).
-- [ ] Fix dead `MediaFile::$filePath` getter/setter (unmapped property).
-- [ ] Add automated tests (none currently in repo).
-- [ ] Add CI + container build pipeline.
+- [ ] Phase 2: signed short-lived URLs (nginx `secure_link`) so browsers don't carry API keys.
+- [ ] Phase 2: HLS adaptive ladder for video.
+- [ ] One key per consumer environment (prod/demo/qa/dev currently share keys).
+- [ ] CI: PHPUnit + PHPStan (starter workflow exists; needs ffmpeg + the `_test` DB).

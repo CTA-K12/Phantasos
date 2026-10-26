@@ -1,0 +1,19 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "zzz"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "19",
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "status": 404,
+    "text": "Media was not found"
+  }
+}

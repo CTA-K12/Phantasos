@@ -1,0 +1,18 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {},
+    "path": "/api/requestUploadTicket"
+  },
+  "response": {
+    "headers": {
+      "allow": "POST",
+      "cache-control": "no-cache",
+      "content-length": "489",
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "status": 405,
+    "text": "<!DOCTYPE html>\n<html>\n    <head>\n        <meta charset=\"UTF-8\" />\n        <title>An Error Occurred: Method Not Allowed</title>\n    </head>\n    <body>\n        <h1>Oops! An Error Occurred</h1>\n        <h2>The server returned a \"405 Method Not Allowed\".</h2>\n\n        <div>\n            Something is broken. Please let us know what you were doing when this error occurred.\n            We will fix it as soon as possible. Sorry for any inconvenience caused.\n        </div>\n    </body>\n</html>\n"
+  }
+}

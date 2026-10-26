@@ -38,7 +38,7 @@ jobs:
           cat > .env <<'EOF'
           APP_ENV=dev
           APP_SECRET=ci_secret_not_for_production
-          DATABASE_URL="postgresql://cta_ci:cta_ci@localhost:5432/cta_starter_ci?serverVersion=16&charset=utf8"
+          DATABASE_URL="postgresql://cta_ci:cta_ci@localhost:5432/phantasos_ci?serverVersion=17&charset=utf8"
           GOOGLE_CLIENT_ID=ci-client-id
           GOOGLE_CLIENT_SECRET=ci-client-secret
           GOOGLE_HOSTED_DOMAIN=
@@ -76,9 +76,10 @@ jobs:
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:17
         env:
-          POSTGRES_DB: cta_starter_ci
+          # Tests use dbname_suffix "_test" (config/packages/doctrine.yaml).
+          POSTGRES_DB: phantasos_ci_test
           POSTGRES_USER: cta_ci
           POSTGRES_PASSWORD: cta_ci
         ports:
@@ -96,15 +97,18 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          extensions: intl, pdo_pgsql
+          extensions: intl, pdo_pgsql, gd, fileinfo
           coverage: none
+
+      - name: Install ffmpeg (audio/video processor tests)
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
       - name: Create .env (required for Composer post-install cache:clear)
         run: |
           cat > .env <<'EOF'
           APP_ENV=test
           APP_SECRET=ci_secret_not_for_production
-          DATABASE_URL="postgresql://cta_ci:cta_ci@localhost:5432/cta_starter_ci?serverVersion=16&charset=utf8"
+          DATABASE_URL="postgresql://cta_ci:cta_ci@localhost:5432/phantasos_ci?serverVersion=17&charset=utf8"
           GOOGLE_CLIENT_ID=ci-client-id
           GOOGLE_CLIENT_SECRET=ci-client-secret
           GOOGLE_HOSTED_DOMAIN=

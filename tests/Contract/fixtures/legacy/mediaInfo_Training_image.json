@@ -1,0 +1,77 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "645cfd88ae2adc8d2a72291d"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "862",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "image/jpeg",
+          "file_name": "original.jpeg",
+          "media_file_id": "645cfd8fae2adce223722921",
+          "size": []
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "thumbnail.png",
+          "media_file_id": "645cfd9032317bfa578b458b",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 75,
+            "width": 75
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "small.png",
+          "media_file_id": "645cfd9032317bfa578b458c",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 240,
+            "width": 320
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "medium.png",
+          "media_file_id": "645cfd9132317bfa578b458d",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 480,
+            "width": 640
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "large.png",
+          "media_file_id": "645cfd9232317bfa578b458e",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 768,
+            "width": 1024
+          }
+        }
+      ],
+      "original_exists": true,
+      "owner": "Training",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "image"
+    },
+    "raw": "{\"owner\":\"Training\",\"type\":\"image\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.jpeg\",\"content_type\":\"image\\/jpeg\",\"media_file_id\":\"645cfd8fae2adce223722921\",\"size\":[]},{\"file_name\":\"thumbnail.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"645cfd9032317bfa578b458b\",\"size\":{\"width\":75,\"height\":75,\"bitrate\":\"72ppi\"}},{\"file_name\":\"small.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"645cfd9032317bfa578b458c\",\"size\":{\"width\":320,\"height\":240,\"bitrate\":\"72ppi\"}},{\"file_name\":\"medium.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"645cfd9132317bfa578b458d\",\"size\":{\"width\":640,\"height\":480,\"bitrate\":\"72ppi\"}},{\"file_name\":\"large.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"645cfd9232317bfa578b458e\",\"size\":{\"width\":1024,\"height\":768,\"bitrate\":\"72ppi\"}}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "request": {
+    "key": "<key:SubDocs>",
+    "method": "GET",
+    "params": {
+      "media_id": "659d76e3ae2adceb58a220f5"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "263",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "application/pdf",
+          "file_name": "original.pdf",
+          "media_file_id": "659d76f6ae2adcd757a220f5",
+          "size": []
+        }
+      ],
+      "original_exists": true,
+      "owner": "SubDocs",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "pdf"
+    },
+    "raw": "{\"owner\":\"SubDocs\",\"type\":\"pdf\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.pdf\",\"content_type\":\"application\\/pdf\",\"media_file_id\":\"659d76f6ae2adcd757a220f5\",\"size\":[]}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "645cfd8fae2adce223722921"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "1383952",
+      "content-type": "image/jpeg",
+      "last-modified": "Thu, 11 May 2023 14:37:03 GMT"
+    },
+    "status": 200
+  }
+}

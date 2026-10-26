@@ -8,11 +8,27 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        # The API authenticator loads the client itself (by key hash); this only satisfies the firewall.
+        api_client_provider:
+            entity:
+                class: App\Entity\ApiClient
+                property: keyHash
 
     firewalls:
         dev:
             pattern: ^/(_profiler|_wdt|assets|build)/
             security: false
+        # Browser upload with a one-time ticket ID instead of a key (legacy contract).
+        api_upload:
+            pattern: ^/api/uploadMedia/
+            security: false
+        api:
+            pattern: ^/api/
+            stateless: true
+            provider: api_client_provider
+            custom_authenticators:
+                - App\Security\ApiKeyAuthenticator
+            entry_point: App\Security\ApiKeyAuthenticator
         main:
             lazy: true
             provider: app_user_provider
@@ -24,6 +40,8 @@ security:
                 target: app_login
 
     access_control:
+        - { path: ^/api/uploadMedia/, roles: PUBLIC_ACCESS }
+        - { path: ^/api/, roles: ROLE_API_CLIENT }
         - { path: ^/login, roles: PUBLIC_ACCESS }
         - { path: ^/connect, roles: PUBLIC_ACCESS }
         - { path: ^/pending-approval, roles: PUBLIC_ACCESS }

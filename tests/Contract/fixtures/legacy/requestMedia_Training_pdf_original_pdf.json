@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "6ab6f28cae2adc365b5f4147"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "3593692",
+      "content-type": "application/pdf",
+      "last-modified": "Fri, 25 Sep 2026 22:15:40 GMT"
+    },
+    "status": 200
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "request": {
+    "key": null,
+    "method": "GET",
+    "params": {
+      "media_id": "000000000000000000000000"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "23",
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "status": 403,
+    "text": "Authentication Failed. "
+  }
+}

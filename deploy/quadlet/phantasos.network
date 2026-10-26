@@ -1,0 +1,3 @@
+# Private network for the three Phantasos containers; nginx reaches PHP-FPM by name.
+[Network]
+NetworkName=phantasos

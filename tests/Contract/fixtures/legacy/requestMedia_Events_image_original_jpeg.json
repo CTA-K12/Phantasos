@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Events>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "61d8ac4bae2adc216e91f7e7"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "796293",
+      "content-type": "image/jpeg",
+      "last-modified": "Fri, 07 Jan 2022 21:10:35 GMT"
+    },
+    "status": 200
+  }
+}

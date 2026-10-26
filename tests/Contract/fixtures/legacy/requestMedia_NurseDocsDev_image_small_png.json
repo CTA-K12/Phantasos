@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:NurseDocsDev>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "6a68e5abf47ce586468b4570"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "147102",
+      "content-type": "image/png",
+      "last-modified": "Tue, 28 Jul 2026 17:23:55 GMT"
+    },
+    "status": 200
+  }
+}

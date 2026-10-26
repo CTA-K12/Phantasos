@@ -24,9 +24,13 @@ doctrine:
 when@test:
     doctrine:
         dbal:
-            # Using same database with DAMA transaction wrapping for test isolation
-            # If you have a separate test database, uncomment:
-            # dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+            # Separate database (phantasos_dev_test) so imported legacy data in the dev
+            # database never collides with test rows. DAMA still wraps each test in a
+            # rolled-back transaction. Create once:
+            #   APP_ENV=test php bin/console doctrine:database:create
+            #   APP_ENV=test php bin/console doctrine:migrations:migrate -n
+            #   APP_ENV=test php bin/console doctrine:fixtures:load -n
+            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
 
 when@prod:
     doctrine:

@@ -1,0 +1,115 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "6a615189ae2adc1459007dac"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "1429",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "video/webm",
+          "file_name": "original.webm",
+          "media_file_id": "6a6151b1ae2adc1859007dac",
+          "size": []
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "small-frame.png",
+          "media_file_id": "6a6151db1357b0cb698b4567",
+          "size": {
+            "height": 360,
+            "width": 640
+          }
+        },
+        {
+          "content_type": "video/mp4",
+          "file_name": "small.mp4",
+          "media_file_id": "6a6151db1357b0cb698b4568",
+          "size": {
+            "bitrate": "750",
+            "height": 360,
+            "width": 640
+          }
+        },
+        {
+          "content_type": "video/webm",
+          "file_name": "small.webm",
+          "media_file_id": "6a6151db1357b0cb698b4569",
+          "size": {
+            "bitrate": "750",
+            "height": 360,
+            "width": 640
+          }
+        },
+        {
+          "content_type": "video/ogg",
+          "file_name": "small.ogv",
+          "media_file_id": "6a6151db1357b0cb698b456a",
+          "size": {
+            "bitrate": "750",
+            "height": 360,
+            "width": 640
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "large-frame.png",
+          "media_file_id": "6a6152581357b0cb698b456b",
+          "size": {
+            "height": 720,
+            "width": 1280
+          }
+        },
+        {
+          "content_type": "video/mp4",
+          "file_name": "large.mp4",
+          "media_file_id": "6a6152581357b0cb698b456c",
+          "size": {
+            "bitrate": "2500",
+            "height": 720,
+            "width": 1280
+          }
+        },
+        {
+          "content_type": "video/webm",
+          "file_name": "large.webm",
+          "media_file_id": "6a6152581357b0cb698b456d",
+          "size": {
+            "bitrate": "2500",
+            "height": 720,
+            "width": 1280
+          }
+        },
+        {
+          "content_type": "video/ogg",
+          "file_name": "large.ogv",
+          "media_file_id": "6a6152581357b0cb698b456e",
+          "size": {
+            "bitrate": "2500",
+            "height": 720,
+            "width": 1280
+          }
+        }
+      ],
+      "original_exists": true,
+      "owner": "Training",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "video"
+    },
+    "raw": "{\"owner\":\"Training\",\"type\":\"video\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.webm\",\"content_type\":\"video\\/webm\",\"media_file_id\":\"6a6151b1ae2adc1859007dac\",\"size\":[]},{\"file_name\":\"small-frame.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"6a6151db1357b0cb698b4567\",\"size\":{\"width\":640,\"height\":360}},{\"file_name\":\"small.mp4\",\"content_type\":\"video\\/mp4\",\"media_file_id\":\"6a6151db1357b0cb698b4568\",\"size\":{\"width\":640,\"height\":360,\"bitrate\":\"750\"}},{\"file_name\":\"small.webm\",\"content_type\":\"video\\/webm\",\"media_file_id\":\"6a6151db1357b0cb698b4569\",\"size\":{\"width\":640,\"height\":360,\"bitrate\":\"750\"}},{\"file_name\":\"small.ogv\",\"content_type\":\"video\\/ogg\",\"media_file_id\":\"6a6151db1357b0cb698b456a\",\"size\":{\"width\":640,\"height\":360,\"bitrate\":\"750\"}},{\"file_name\":\"large-frame.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"6a6152581357b0cb698b456b\",\"size\":{\"width\":1280,\"height\":720}},{\"file_name\":\"large.mp4\",\"content_type\":\"video\\/mp4\",\"media_file_id\":\"6a6152581357b0cb698b456c\",\"size\":{\"width\":1280,\"height\":720,\"bitrate\":\"2500\"}},{\"file_name\":\"large.webm\",\"content_type\":\"video\\/webm\",\"media_file_id\":\"6a6152581357b0cb698b456d\",\"size\":{\"width\":1280,\"height\":720,\"bitrate\":\"2500\"}},{\"file_name\":\"large.ogv\",\"content_type\":\"video\\/ogg\",\"media_file_id\":\"6a6152581357b0cb698b456e\",\"size\":{\"width\":1280,\"height\":720,\"bitrate\":\"2500\"}}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

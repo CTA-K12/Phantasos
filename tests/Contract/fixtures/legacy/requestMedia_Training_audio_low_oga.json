@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "64f750951357b0af628b4808"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "24203896",
+      "content-type": "audio/vorbis",
+      "last-modified": "Tue, 05 Sep 2023 16:00:20 GMT"
+    },
+    "status": 200
+  }
+}

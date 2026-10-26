@@ -1,0 +1,21 @@
+{
+  "request": {
+    "key": null,
+    "method": "POST",
+    "params": {},
+    "path": "/api/uploadMedia/61d8ac4aae2adcb27e91f7d3"
+  },
+  "response": {
+    "headers": {
+      "access-control-allow-credentials": "true",
+      "access-control-allow-headers": "Content-Type, X-Requested-With, X-PINGOTHER, X-File-Name, Cache-Control, Origin",
+      "access-control-allow-methods": "POST, GET, PUT, OPTIONS",
+      "access-control-allow-origin": "*",
+      "cache-control": "no-cache",
+      "content-length": "26",
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "status": 400,
+    "text": "Upload ticket already used"
+  }
+}

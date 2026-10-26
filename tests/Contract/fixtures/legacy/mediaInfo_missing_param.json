@@ -1,0 +1,17 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {},
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "28",
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "status": 400,
+    "text": "Field \"media_id\" is required"
+  }
+}

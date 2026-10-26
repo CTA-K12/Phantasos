@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:SubDocs>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "659d76f6ae2adcd757a220f5"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "539746",
+      "content-type": "application/pdf",
+      "last-modified": "Tue, 09 Jan 2024 16:40:22 GMT"
+    },
+    "status": 200
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "6a6151b1ae2adc1859007dac"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "2165175",
+      "content-type": "video/webm",
+      "last-modified": "Wed, 22 Jul 2026 23:26:41 GMT"
+    },
+    "status": 200
+  }
+}

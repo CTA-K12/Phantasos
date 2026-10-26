@@ -1,0 +1,69 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "64f74e38ae2adc2b6d049856"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "754",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "application/ogg",
+          "file_name": "original.ogx",
+          "media_file_id": "64f7504eae2adc8669049856",
+          "size": []
+        },
+        {
+          "content_type": "audio/mpeg",
+          "file_name": "low.mp3",
+          "media_file_id": "64f750941357b0af628b4807",
+          "size": {
+            "bitrate": "64"
+          }
+        },
+        {
+          "content_type": "audio/vorbis",
+          "file_name": "low.oga",
+          "media_file_id": "64f750951357b0af628b4808",
+          "size": {
+            "bitrate": "64"
+          }
+        },
+        {
+          "content_type": "audio/mpeg",
+          "file_name": "high.mp3",
+          "media_file_id": "64f750da1357b0af628b4809",
+          "size": {
+            "bitrate": "192"
+          }
+        },
+        {
+          "content_type": "audio/vorbis",
+          "file_name": "high.oga",
+          "media_file_id": "64f750da1357b0af628b480a",
+          "size": {
+            "bitrate": "192"
+          }
+        }
+      ],
+      "original_exists": true,
+      "owner": "Training",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "audio"
+    },
+    "raw": "{\"owner\":\"Training\",\"type\":\"audio\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.ogx\",\"content_type\":\"application\\/ogg\",\"media_file_id\":\"64f7504eae2adc8669049856\",\"size\":[]},{\"file_name\":\"low.mp3\",\"content_type\":\"audio\\/mpeg\",\"media_file_id\":\"64f750941357b0af628b4807\",\"size\":{\"bitrate\":\"64\"}},{\"file_name\":\"low.oga\",\"content_type\":\"audio\\/vorbis\",\"media_file_id\":\"64f750951357b0af628b4808\",\"size\":{\"bitrate\":\"64\"}},{\"file_name\":\"high.mp3\",\"content_type\":\"audio\\/mpeg\",\"media_file_id\":\"64f750da1357b0af628b4809\",\"size\":{\"bitrate\":\"192\"}},{\"file_name\":\"high.oga\",\"content_type\":\"audio\\/vorbis\",\"media_file_id\":\"64f750da1357b0af628b480a\",\"size\":{\"bitrate\":\"192\"}}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

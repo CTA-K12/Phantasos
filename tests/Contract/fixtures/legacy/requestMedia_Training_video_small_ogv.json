@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "6a6151db1357b0cb698b456a"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "3263466",
+      "content-type": "video/ogg",
+      "last-modified": "Wed, 22 Jul 2026 23:27:23 GMT"
+    },
+    "status": 200
+  }
+}

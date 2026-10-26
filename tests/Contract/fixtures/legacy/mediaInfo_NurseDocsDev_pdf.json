@@ -1,0 +1,37 @@
+{
+  "request": {
+    "key": "<key:NurseDocsDev>",
+    "method": "GET",
+    "params": {
+      "media_id": "6a971128ae2adcb110f07671"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "268",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "application/pdf",
+          "file_name": "original.pdf",
+          "media_file_id": "6a9714cdae2adcc204f07671",
+          "size": []
+        }
+      ],
+      "original_exists": true,
+      "owner": "NurseDocsDev",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "pdf"
+    },
+    "raw": "{\"owner\":\"NurseDocsDev\",\"type\":\"pdf\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.pdf\",\"content_type\":\"application\\/pdf\",\"media_file_id\":\"6a9714cdae2adcc204f07671\",\"size\":[]}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

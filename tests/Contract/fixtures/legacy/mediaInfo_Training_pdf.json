@@ -1,0 +1,37 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "6ab6f286ae2adc115b5f4147"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "264",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "application/pdf",
+          "file_name": "original.pdf",
+          "media_file_id": "6ab6f28cae2adc365b5f4147",
+          "size": []
+        }
+      ],
+      "original_exists": true,
+      "owner": "Training",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "pdf"
+    },
+    "raw": "{\"owner\":\"Training\",\"type\":\"pdf\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.pdf\",\"content_type\":\"application\\/pdf\",\"media_file_id\":\"6ab6f28cae2adc365b5f4147\",\"size\":[]}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

@@ -1,0 +1,77 @@
+{
+  "request": {
+    "key": "<key:Events>",
+    "method": "GET",
+    "params": {
+      "media_id": "61d8ac4aae2adcb27e91f7d3"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "860",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "image/jpeg",
+          "file_name": "original.jpeg",
+          "media_file_id": "61d8ac4bae2adc216e91f7e7",
+          "size": []
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "thumbnail.png",
+          "media_file_id": "61d8ac4bf47ce5a4498b47ab",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 75,
+            "width": 75
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "small.png",
+          "media_file_id": "61d8ac4cf47ce5a4498b47ac",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 240,
+            "width": 320
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "medium.png",
+          "media_file_id": "61d8ac4cf47ce5a4498b47ad",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 480,
+            "width": 640
+          }
+        },
+        {
+          "content_type": "image/png",
+          "file_name": "large.png",
+          "media_file_id": "61d8ac4df47ce5a4498b47ae",
+          "size": {
+            "bitrate": "72ppi",
+            "height": 768,
+            "width": 1024
+          }
+        }
+      ],
+      "original_exists": true,
+      "owner": "Events",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "image"
+    },
+    "raw": "{\"owner\":\"Events\",\"type\":\"image\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.jpeg\",\"content_type\":\"image\\/jpeg\",\"media_file_id\":\"61d8ac4bae2adc216e91f7e7\",\"size\":[]},{\"file_name\":\"thumbnail.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"61d8ac4bf47ce5a4498b47ab\",\"size\":{\"width\":75,\"height\":75,\"bitrate\":\"72ppi\"}},{\"file_name\":\"small.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"61d8ac4cf47ce5a4498b47ac\",\"size\":{\"width\":320,\"height\":240,\"bitrate\":\"72ppi\"}},{\"file_name\":\"medium.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"61d8ac4cf47ce5a4498b47ad\",\"size\":{\"width\":640,\"height\":480,\"bitrate\":\"72ppi\"}},{\"file_name\":\"large.png\",\"content_type\":\"image\\/png\",\"media_file_id\":\"61d8ac4df47ce5a4498b47ae\",\"size\":{\"width\":1024,\"height\":768,\"bitrate\":\"72ppi\"}}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

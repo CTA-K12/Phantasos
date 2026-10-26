@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:HealthedTrainingsNWRESD>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "6ac6b4ed1357b0ca698b456f"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "7076",
+      "content-type": "image/png",
+      "last-modified": "Wed, 07 Oct 2026 21:09:01 GMT"
+    },
+    "status": 200
+  }
+}

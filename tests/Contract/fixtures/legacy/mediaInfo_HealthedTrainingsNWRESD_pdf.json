@@ -1,0 +1,37 @@
+{
+  "request": {
+    "key": "<key:HealthedTrainingsNWRESD>",
+    "method": "GET",
+    "params": {
+      "media_id": "6ac92557ae2adc45513a35a7"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "279",
+      "content-type": "application/json"
+    },
+    "json": {
+      "files": [
+        {
+          "content_type": "application/pdf",
+          "file_name": "original.pdf",
+          "media_file_id": "6ac92558ae2adc04653a35a6",
+          "size": []
+        }
+      ],
+      "original_exists": true,
+      "owner": "HealthedTrainingsNWRESD",
+      "processing_percentage": 100,
+      "ready": true,
+      "security": [],
+      "status": "Ready",
+      "tags": [],
+      "type": "pdf"
+    },
+    "raw": "{\"owner\":\"HealthedTrainingsNWRESD\",\"type\":\"pdf\",\"original_exists\":true,\"tags\":[],\"security\":[],\"files\":[{\"file_name\":\"original.pdf\",\"content_type\":\"application\\/pdf\",\"media_file_id\":\"6ac92558ae2adc04653a35a6\",\"size\":[]}],\"ready\":true,\"status\":\"Ready\",\"processing_percentage\":100}",
+    "status": 200
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "64f750da1357b0af628b4809"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "49193613",
+      "content-type": "audio/mpeg",
+      "last-modified": "Tue, 05 Sep 2023 16:00:47 GMT"
+    },
+    "status": 200
+  }
+}

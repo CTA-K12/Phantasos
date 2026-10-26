@@ -1,0 +1,19 @@
+{
+  "request": {
+    "key": "<key:Training>",
+    "method": "GET",
+    "params": {
+      "media_id": "61d8ac4aae2adcb27e91f7d3"
+    },
+    "path": "/api/mediaInfo"
+  },
+  "response": {
+    "headers": {
+      "cache-control": "no-cache",
+      "content-length": "30",
+      "content-type": "text/html; charset=UTF-8"
+    },
+    "status": 404,
+    "text": "Requested media does not exist"
+  }
+}

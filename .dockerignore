@@ -1,0 +1,17 @@
+# Nothing secret or local may enter an image. Runtime config comes from the
+# container environment (deploy/phantasos.env on the host), never a baked .env.
+.git
+.env
+.env.*
+!.docker/php/env.defaults
+migration/
+.venv/
+vendor/
+var/
+tests/
+node_modules/
+.phpunit.cache/
+.claude/
+.memsearch
+*.md
+!docs/help/*.md

@@ -1,0 +1,20 @@
+{
+  "request": {
+    "key": "<key:SubDocs>",
+    "method": "HEAD",
+    "params": {
+      "media_file_id": "645d6bacf47ce5a4498b47e1"
+    },
+    "path": "/api/requestMedia"
+  },
+  "response": {
+    "headers": {
+      "accept-ranges": "bytes",
+      "cache-control": "public",
+      "content-length": "299330",
+      "content-type": "image/png",
+      "last-modified": "Thu, 11 May 2023 22:26:52 GMT"
+    },
+    "status": 200
+  }
+}

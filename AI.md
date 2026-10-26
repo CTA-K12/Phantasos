@@ -431,7 +431,7 @@ Alpine containers following the team pattern (`alpine:3` + `php84` packages, non
 `nginx`, `php-fpm`, `worker` (same image, runs `messenger:consume`), with ffmpeg in the image. `/media`
 (LUKS) is bind-mounted; SELinux context is set once on the host — **never `:Z`**. Images go to Harbor
 (Trivy). Differences from the team pattern for an ePHI service: Composer is fetched with TLS verification,
-and secrets are injected at runtime (not baked into the image via `.env`).
+and secrets are injected at runtime (not baked into the image via `.env`). As built: see §14.
 
 **Network/TLS:** public 443 directly on .21; Let's Encrypt via Route53 DNS-01 with one cert for **both**
 `phantasos.apps.cascadetech.org` (testing) and `phantasos.mesd.k12.or.us` (after the DNS flip). TBC that
@@ -458,3 +458,79 @@ directly without the API key; HLS adaptive ladder for video.
 NurseDocsDev→DocGuard; `storage_key` = old ObjectId hex so file paths never change; skips abandoned
 upload tickets with no files) + rsync of /media. Test on the new hostname (test writes are disposable).
 Cutover: stop the old web server → final rsync (`--delete`) + full re-import → DNS flip → monitor 1h.
+
+## 14. As built (2026-10-25)
+
+State of the `php8_upgrade` working tree. Everything below is implemented and tested unless marked open.
+
+**Code map**
+- `src/Controller/Api/ApiController.php`: the four legacy endpoints.
+- `src/Security/ApiKeyAuthenticator.php`: key from the `X-Api-Key` header, then the `apikey` query parameter, then the form field.
+  Failures return `403 "Authentication Failed. "`, as legacy did.
+- `src/Entity/{ApiClient,Media,MediaFile}.php`, plus enums in `src/Enum/` holding the legacy status and type strings.
+- `src/Service/MediaInfoPresenter.php`: builds the byte-identical mediaInfo body.
+- `src/Service/MediaFileResponder.php`: X-Accel-Redirect in prod, BinaryFileResponse in dev and tests.
+- `src/Service/MediaStorage.php`: the legacy disk layout.
+- `src/Processor/*`: one processor per type, tagged `app.processor`.
+- `src/MessageHandler/ProcessMediaHandler.php`: the worker. Processing failure sets the status to "Failed to process", then Messenger retries and finally parks the message in `failed`.
+
+**IDs and keys**
+- Media and media-file IDs stay 24-hex ObjectIds (`App\Util\LegacyId`). Imported rows keep their IDs, and new ones use the same format.
+- They are the public IDs, and they decide the disk path `<id0:5>/<id5:10>/<id10:15>/<id>/`.
+- API keys are stored only as SHA-256 (`api_client.key_hash`), so imported keys keep working unchanged.
+
+**Contract evidence**
+- `migration/capture_contract.py` recorded legacy responses into `tests/Contract/fixtures/legacy/`. In those fixtures the `raw` field is authoritative; the parsed `json` has sorted keys.
+- `tests/Contract/LegacyApiContractTest.php` replays them byte for byte.
+- `migration/parity_check.py`: old and new mediaInfo matched 150/150 (30 random media per app, real keys, renamed clients included).
+
+**Deliberate differences from legacy**
+- Ownership is enforced. requestMedia and mediaInfo for another app's media return 404. Legacy served any file to any key.
+- Unknown or malformed IDs return 404, not 500. Both mediaInfo not-found cases return "Media was not found".
+- Files are served with `Cache-Control: private`, not `public`.
+- `owner` in mediaInfo reports `api_client.legacy_name` when set, so renamed clients still show `Events` and `NurseDocsDev` to consumers.
+- New audio produces only `low.mp3` and `high.mp3`; new video produces only `small`/`large` `-frame.png` and `.mp4`. Imported media keep their existing webm, ogv and oga files.
+- Video is letterboxed to exactly 640×360 and 1280×720.
+- **Open: Word and Excel processors are not built.** The current data has zero word or excel media, and Office parsers have a long record of XML vulnerabilities. Such uploads now get `400 Filetype "…" is not supported.`. Decide before cutover whether to add them (PhpSpreadsheet / PHPWord).
+
+**Legacy behaviour kept on purpose**
+- Image renditions are stretched to the exact box size, with "72ppi" in `bitrate`.
+- Ticket lifetime is 2 h, and `expiration` is reported in Pacific time.
+- Whole floats are written as `100`, not `100.0`.
+- The CORS headers on uploadMedia are unchanged.
+- Callbacks are a form POST of `media_id`, and only HTTP 200 counts as sent.
+- Callback URLs without a scheme get `http://`. SubDocs registers `ortrac.mesd.k12.or.us/subdocs/external/...`; 29,308 of 34,472 were delivered that way.
+
+**Time:** timestamps are stored naive in `APP_TIMEZONE` (America/Los_Angeles), set in `Kernel::boot()` so the web, the worker and the tests agree. The import converts Mongo UTC to Pacific.
+
+**Tests**
+- PHPUnit uses `phantasos_dev_test` (`dbname_suffix`), so imported data in `phantasos_dev` never collides with test rows.
+- 100 tests, PHPStan level 8 clean.
+- The ffmpeg tests skip when ffmpeg is missing.
+
+**Import (`migration/import_to_pg.py`)**
+- Per app, in one transaction: upsert the client, delete that client's media, then insert from Mongo, with a count check that rolls back on mismatch. Runs are idempotent.
+- Dry-run is the default; `--apply` writes.
+- Result: 39,486 media and 43,350 files. All Ready media were imported, every file reference resolved, and the 24,527 never-uploaded tickets were skipped.
+- It ran on the local dev DB and **on appdev-pg-prod** (schema migrated, rehearsal import done 2026-10-25). Every prod table and index is pg_tde-encrypted.
+
+**Containers** (`.docker/Dockerfile`, targets `app` and `web`; verified locally end to end)
+- The `app` target is PHP-FPM; the same image runs the worker with `messenger:consume`.
+- No secrets are baked in: the image's `.env` is `.docker/php/env.defaults`, and secrets come from the host env file. Composer comes from the official `composer:2` image.
+- The image runs as non-root (nobody / nginx).
+- `upload_tmp_dir` is on `/media`, so in-flight uploads land on the encrypted volume.
+- nginx streams uploads to FPM (no body buffering), drops unknown Host headers, logs paths without the query string, and serves `/_media/` as internal only.
+- Trusted proxies: none. Trusted hosts: the two names.
+
+**Deploy (Podman Quadlet, `deploy/quadlet/`)**
+- Units: `phantasos-{app,worker,web}.container` plus `phantasos.network`.
+- Images: `appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-{app,web}:<tag>`.
+- `deploy/compose.yaml` runs the same stack (used for the local smoke test).
+
+Host prerequisites (handoff):
+- `/etc/phantasos/phantasos.env`, root-owned, mode 600 (template: `deploy/phantasos.env.example`).
+- `/etc/phantasos/tls/{fullchain,privkey}.pem`.
+- `/media/phantasos` and `/media/.upload-tmp` writable by uid 65534 (`nobody` in Alpine). The rsync from the old server must set ownership to match, e.g. `--chown=65534:65534`.
+- SELinux fcontext on `/media` (no `:Z`).
+- A Harbor robot login for podman.
+- Certificate renewal hook: `podman exec phantasos-web nginx -s reload`.

@@ -1,0 +1,34 @@
+# Same stack as the Quadlet units, for local smoke tests and as a fallback runtime
+# (docker compose / podman compose). Production uses deploy/quadlet/.
+#
+#   PHANTASOS_ENV_FILE=/path/to/phantasos.env \
+#   PHANTASOS_MEDIA=/media PHANTASOS_TLS=/etc/phantasos/tls \
+#   docker compose -f deploy/compose.yaml up -d
+name: phantasos
+
+x-app: &app
+  image: ${PHANTASOS_APP_IMAGE:-phantasos-app:local}
+  env_file: ${PHANTASOS_ENV_FILE:?set PHANTASOS_ENV_FILE}
+  volumes:
+    - ${PHANTASOS_MEDIA:?set PHANTASOS_MEDIA}:/media
+  restart: unless-stopped
+
+services:
+  phantasos-app:
+    <<: *app
+
+  phantasos-worker:
+    <<: *app
+    # Restarts hourly (time limit) to release memory; Messenger retries/failed queue in PG.
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "--memory-limit=768M", "-vv"]
+
+  phantasos-web:
+    image: ${PHANTASOS_WEB_IMAGE:-phantasos-web:local}
+    depends_on: [phantasos-app]
+    ports:
+      - "${PHANTASOS_HTTP_PORT:-80}:8080"
+      - "${PHANTASOS_HTTPS_PORT:-443}:8443"
+    volumes:
+      - ${PHANTASOS_MEDIA:?set PHANTASOS_MEDIA}/phantasos:/media/phantasos:ro
+      - ${PHANTASOS_TLS:?set PHANTASOS_TLS}:/etc/nginx/tls:ro
+    restart: unless-stopped

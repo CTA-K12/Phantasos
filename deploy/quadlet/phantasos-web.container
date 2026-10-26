@@ -1,0 +1,27 @@
+# nginx: TLS on 443 (80 redirects), static assets, X-Accel file delivery.
+# Reload after certificate renewal: podman exec phantasos-web nginx -s reload
+[Unit]
+Description=Phantasos nginx
+Requires=phantasos-app.service phantasos-worker.service
+After=phantasos-app.service
+
+[Container]
+ContainerName=phantasos-web
+Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-web:TAG
+Network=phantasos.network
+PublishPort=443:8443
+PublishPort=80:8080
+# Read-only: nginx only reads files PHP has authorised via X-Accel-Redirect.
+Volume=/media/phantasos:/media/phantasos:ro
+# fullchain.pem + privkey.pem (Let's Encrypt; the cert covers both hostnames).
+Volume=/etc/phantasos/tls:/etc/nginx/tls:ro
+NoNewPrivileges=true
+DropCapability=ALL
+LogDriver=journald
+
+[Service]
+Restart=always
+TimeoutStartSec=300
+
+[Install]
+WantedBy=multi-user.target

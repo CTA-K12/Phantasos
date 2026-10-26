@@ -1,0 +1,29 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # Queue lives in the app's PostgreSQL database (messenger_messages table, created
+            # by a migration — auto_setup is off so the runtime never needs DDL rights).
+            # redeliver_timeout must exceed the longest video encode, or a slow job is
+            # handed to a second worker while the first is still running.
+            async:
+                dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
+                options:
+                    queue_name: process_media
+                    redeliver_timeout: 14400
+                retry_strategy:
+                    max_retries: 2
+                    delay: 60000
+                    multiplier: 5
+            failed: '%env(MESSENGER_TRANSPORT_DSN)%&queue_name=failed'
+
+        routing:
+            'App\Message\ProcessMedia': async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                async: 'in-memory://'
+                failed: 'in-memory://'
