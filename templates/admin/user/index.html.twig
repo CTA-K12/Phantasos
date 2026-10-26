@@ -1,0 +1,143 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}Users — Admin{% endblock %}
+
+{% block content %}
+
+{# ── Page header ── #}
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md">
+        <h4 class="mb-0">Users</h4>
+    </div>
+    <div class="col-12 col-md-auto">
+        <div class="bg-white border rounded px-3 py-2">
+            <div class="row g-2">
+                <div class="col-12 col-md-auto">
+                    <a href="{{ path('admin_user_new') }}" class="btn btn-primary btn-sm w-100">
+                        <i data-lucide="user-plus" style="width:15px;height:15px;vertical-align:-2px;"></i> New User
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# ── Table controls + card ── #}
+<div data-controller="table-controls">
+
+    {# Controls bar: search left, per-page right #}
+    <div class="table-controls-bar d-flex justify-content-between align-items-center mb-3">
+        <div class="input-group input-group-sm table-controls-search">
+            <span class="input-group-text bg-white border-end-0">
+                <i data-lucide="search" style="width:14px;height:14px;color:#6c757d;"></i>
+            </span>
+            <input type="text"
+                   class="form-control border-start-0 ps-0"
+                   placeholder="Search by name or email…"
+                   aria-label="Search"
+                   data-table-controls-target="search"
+                   data-action="input->table-controls#search">
+        </div>
+        <div class="table-controls-actions">
+            <span class="text-muted small">Show</span>
+            <select class="form-select form-select-sm"
+                    style="width:auto;"
+                    aria-label="Records per page"
+                    data-table-controls-target="perPage"
+                    data-action="change->table-controls#changePerPage">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+            <span class="text-muted small">records</span>
+        </div>
+    </div>
+
+    {# Table card #}
+    <div class="card">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th class="text-end" style="width:90px;">Actions</th>
+                </tr>
+            </thead>
+            <tbody data-table-controls-target="tbody">
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center gap-2">
+                            {% if user.avatarUrl %}
+                                <img src="{{ user.avatarUrl }}" alt="" class="user-avatar">
+                            {% else %}
+                                <span class="avatar-initials avatar-initials-sm"
+                                      style="background-color: {{ avatar_color(user.displayName) }}; flex-shrink:0;">
+                                    {{ initials(user.displayName) }}
+                                </span>
+                            {% endif %}
+                            <div>
+                                <div class="fw-semibold lh-sm">{{ user.displayName }}</div>
+                                <div class="text-muted small">{{ user.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        {% if 'ROLE_ADMIN' in user.roles %}
+                            <span class="badge badge-soft-purple">Admin</span>
+                        {% elseif 'ROLE_SUPERVISOR' in user.roles %}
+                            <span class="badge badge-soft-info">Supervisor</span>
+                        {% else %}
+                            <span class="badge badge-soft-secondary">Staff</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if user.isActive %}
+                            <span class="badge badge-soft-success">Active</span>
+                        {% else %}
+                            <span class="badge badge-soft-warning">Inactive</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted small">
+                        {{ user.lastLoginAt ? user.lastLoginAt|date('M j, Y') : '—' }}
+                    </td>
+                    <td class="text-end">
+                        <div class="d-flex justify-content-end gap-1">
+                            <a href="{{ path('admin_user_edit', {id: user.id}) }}"
+                               class="btn btn-icon btn-icon-primary"
+                               title="Edit {{ user.displayName }}">
+                                <i data-lucide="pencil" style="width:15px;height:15px;"></i>
+                            </a>
+                            <form method="POST"
+                                  action="{{ path('admin_user_toggle', {id: user.id}) }}"
+                                  onsubmit="return confirm('{{ user.isActive ? 'Deactivate' : 'Activate' }} {{ user.displayName|e('js') }}?')">
+                                <input type="hidden" name="_token"
+                                       value="{{ csrf_token('toggle-user-' ~ user.id) }}">
+                                <button type="submit"
+                                        class="btn btn-icon {{ user.isActive ? 'btn-icon-danger' : 'btn-icon-primary' }}"
+                                        title="{{ user.isActive ? 'Deactivate' : 'Activate' }} {{ user.displayName }}">
+                                    <i data-lucide="{{ user.isActive ? 'user-x' : 'user-check' }}"
+                                       style="width:15px;height:15px;"></i>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">No users found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="card-footer d-flex justify-content-between align-items-center py-2">
+            <span class="text-muted small" data-table-controls-target="info"></span>
+            <div data-table-controls-target="pagination"></div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 """Shared MongoDB connection helper for Phantasos migration tooling.
 
-Reads connection settings from app/config/parameters.yml so no secrets live in
+Reads connection settings from migration/secrets/legacy-parameters.yml so no secrets live in
 these scripts. Read-only by default; nothing here writes or deletes.
 
 Server is MongoDB 3.0.2 (2015), so we rely on pymongo 3.x (in ../.venv).
@@ -11,7 +11,8 @@ import yaml
 from pymongo import MongoClient
 
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PARAMS_PATH = os.path.join(REPO_ROOT, "app", "config", "parameters.yml")
+# Legacy prod connection settings (gitignored; copied from the old server).
+PARAMS_PATH = os.path.join(REPO_ROOT, "migration", "secrets", "legacy-parameters.yml")
 
 
 def load_params():

@@ -1,0 +1,23 @@
+# see https://symfony.com/doc/current/reference/configuration/framework.html
+framework:
+    secret: '%env(APP_SECRET)%'
+
+    # Note that the session will be started ONLY if you read or write from it.
+    session: true
+
+    #esi: true
+    #fragments: true
+
+    # This configuration is to allow Symfony redirect URI's to outside service APIs from
+    # within http-based Kubernetes to function. example: Google OAuth Sign-in, the redirect
+    # URI needs to be https-based, but the k8s pod is http based and behind an nginx reverse proxy.
+    # WARNING: This trusted proxies configuration would be dangerous if you couldn't
+    # guarantee all traffic to the Symfony pod was coming from the K8S nginx ingress proxy.
+    trusted_proxies: '127.0.0.1,REMOTE_ADDR'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port', 'x-forwarded-prefix']
+
+when@test:
+    framework:
+        test: true
+        session:
+            storage_factory_id: session.storage.factory.mock_file

@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Pending Approval - CTA App{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex align-items-center justify-content-center" style="background: linear-gradient(135deg, #4a6fa5 0%, #2c3e50 100%);">
+    <div class="card shadow-lg" style="max-width: 480px; width: 100%;">
+        <div class="card-body p-5 text-center">
+            <div class="mb-4">
+                <i data-lucide="clock" style="width:48px;height:48px;color:#6c757d;"></i>
+                <h3 class="mt-3">Account Pending Approval</h3>
+            </div>
+
+            <p class="text-muted mb-4">
+                Your account has been created, but an administrator needs to approve your access before you can use this application.
+            </p>
+
+            <p class="text-muted small">
+                Please contact your program administrator to request activation.
+            </p>
+
+            <hr>
+
+            <a href="{{ path('app_logout') }}" class="btn btn-outline-secondary">Sign out</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

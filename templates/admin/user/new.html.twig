@@ -1,0 +1,33 @@
+{% extends 'layout.html.twig' %}
+
+{% block title %}New User — Admin{% endblock %}
+
+{% block content %}
+
+<div class="row align-items-center mb-4 g-3">
+    <div class="col-12 col-md">
+        <h4 class="mb-0">New User</h4>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-lg-6 mx-auto">
+        {{ form_start(form) }}
+        <div class="card">
+            <div class="card-body">
+                {% include 'admin/user/_form.html.twig' %}
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+                <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i data-lucide="arrow-left" style="width:15px;height:15px;vertical-align:-2px;"></i> Cancel
+                </a>
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i data-lucide="user-plus" style="width:15px;height:15px;vertical-align:-2px;"></i> Create User
+                </button>
+            </div>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+
+{% endblock %}

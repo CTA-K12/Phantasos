@@ -1,0 +1,137 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+# Shared env vars used by every step that boots the Symfony kernel.
+# These are safe placeholder values — real secrets stay in .env.local on the server.
+env:
+  APP_SECRET: "ci_secret_not_for_production"
+  GOOGLE_CLIENT_ID: "ci-client-id"
+  GOOGLE_CLIENT_SECRET: "ci-client-secret"
+  GOOGLE_HOSTED_DOMAIN: ""
+  DEFAULT_URI: "http://localhost"
+
+jobs:
+  # ─────────────────────────────────────────────────────────────────
+  # PHPStan static analysis (no database needed)
+  # ─────────────────────────────────────────────────────────────────
+  phpstan:
+    name: PHPStan (level 8)
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP 8.5
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.5'
+          extensions: intl, pdo_pgsql
+          coverage: none
+
+      - name: Create .env (required for Composer post-install cache:clear)
+        run: |
+          cat > .env <<'EOF'
+          APP_ENV=dev
+          APP_SECRET=ci_secret_not_for_production
+          DATABASE_URL="postgresql://cta_ci:cta_ci@localhost:5432/cta_starter_ci?serverVersion=16&charset=utf8"
+          GOOGLE_CLIENT_ID=ci-client-id
+          GOOGLE_CLIENT_SECRET=ci-client-secret
+          GOOGLE_HOSTED_DOMAIN=
+          DEFAULT_URI=http://localhost
+          APP_DEV_AUTH_ENABLED=false
+          EOF
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Warm up dev cache (generates container XML for PHPStan)
+        run: php bin/console cache:warmup --env=dev
+
+      - name: Run PHPStan
+        run: vendor/bin/phpstan analyse --memory-limit=512M --no-progress
+
+  # ─────────────────────────────────────────────────────────────────
+  # Full test suite with live PostgreSQL
+  # ─────────────────────────────────────────────────────────────────
+  test:
+    name: PHPUnit (PHP ${{ matrix.php }})
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: [ '8.5' ]
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: cta_starter_ci
+          POSTGRES_USER: cta_ci
+          POSTGRES_PASSWORD: cta_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: intl, pdo_pgsql
+          coverage: none
+
+      - name: Create .env (required for Composer post-install cache:clear)
+        run: |
+          cat > .env <<'EOF'
+          APP_ENV=test
+          APP_SECRET=ci_secret_not_for_production
+          DATABASE_URL="postgresql://cta_ci:cta_ci@localhost:5432/cta_starter_ci?serverVersion=16&charset=utf8"
+          GOOGLE_CLIENT_ID=ci-client-id
+          GOOGLE_CLIENT_SECRET=ci-client-secret
+          GOOGLE_HOSTED_DOMAIN=
+          APP_DEV_AUTH_ENABLED=false
+          EOF
+
+      - name: Cache Composer packages
+        uses: actions/cache@v4
+        with:
+          path: vendor
+          key: composer-${{ hashFiles('composer.lock') }}
+          restore-keys: composer-
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run database migrations
+        env:
+          APP_ENV: test
+        run: php bin/console doctrine:migrations:migrate --no-interaction --env=test
+
+      - name: Load fixtures
+        env:
+          APP_ENV: test
+        run: php bin/console doctrine:fixtures:load --no-interaction --env=test
+
+      - name: Run test suite
+        env:
+          APP_ENV: test
+        run: composer test

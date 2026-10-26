@@ -184,6 +184,38 @@ under `/media/phantasos`. So a media's files all live in one leaf dir
   deletes the Mongo docs (mediaFile → media → deactivate apiUser). `delete_files.sh` runs on the
   **storage server** to measure/delete the on-disk leaf dirs (pattern-validated, leaf-only).
 
+### App / key inventory (verified 2026-10-25)
+Evidence: ~5 weeks of old-server Apache logs (key hashed server-side, never exported), Mongo upload
+timestamps, and matching `MEDIASERVER_KEY` values in consumer repos by SHA-256 (values never printed).
+
+**Kept keys (ORMed Training moved to purge → 5 keep):**
+
+| Key (old name) | Actually used by | Evidence | Rename at migration |
+|---|---|---|---|
+| `Events` | **HealthEd Trainings — MESD** (`healthed-api`, `healthed-training`; prod/demo/dev/qa) | k8s nodes read; browser uploads | → **`HealthEdTrainingsMESD`** |
+| `HealthedTrainingsNWRESD` | **HealthEd Trainings — NWRESD** (same repos, nwresd envs) | k8s reads; uploads from ttsd.k12.or.us | keep / align naming |
+| `Training` | **Online Training** (`training-api`) — embedded by HealthEd (MESD/NWRESD) and MAC frontends | ~257k `requestMedia` in 5 wks (heavy) | keep |
+| `NurseDocsDev` | **DocGuard** — being decommissioned (unpatchable vuln); now **internal-network only, switched on on demand for urgent research**. **Must stay fully functional until its purge (several months out) — do NOT deactivate its key. Decision: MIGRATES to the new Phantasos as `DocGuard`.** | DocGuard backup configmap key matches | → **`DocGuard`** |
+| `ORMed Training` | legacy ORMed site (`ormed.mesd.k12.or.us`); unused — reads likely bots crawling the old site | ~500 reads in 1 day | **→ PURGE** (added to retire list) |
+| `SubDocs` | older system being disabled; **one NWRESD client still reads (read-only)** | no requests in 5-wk window; no uploads since 2024-01 | **keep for now** |
+
+**Findings to carry into the rebuild:**
+- **SECURITY: file downloads have NO ownership check.** `FileInfo::canBeViewedBy()` is commented out and
+  returns `true`, so *any* valid key can `requestMedia` *any* app's file by `media_file_id` (ObjectIds are
+  semi-guessable). Only `mediaInfo` enforces `hideToOthers`. Log check (5 wks): **zero cross-app reads** —
+  re-enabling the check breaks no current consumer. **Decision: not patched on the old system** (avoid
+  touching exposed legacy PHP; migrate ASAP instead). New system MUST enforce ownership on every read.
+- **DocGuard data may already be ePHI** (nurse document exchange) — if so, ePHI is in Phantasos *today*
+  on the old box, not just with future ORMed. Prioritise it in HIPAA scoping.
+- **One key is shared across prod/demo/dev/qa** for HealthEd (MESD and NWRESD) and Training → non-prod
+  environments read/write production media. New system: **one key per environment**.
+- **API keys travel in the GET query string** → they land in Apache access logs in cleartext. New system:
+  accept the key in a header (keep query-param fallback only during cutover).
+- **Old server is internet-reachable** (browser uploads need it; CISA CyHy scans it). New API sits behind
+  Envoy Gateway on the cluster.
+- Application name is server-side only (derived from the key), so renames are transparent to consumers —
+  do them in the Mongo→PG import, not on the live old system.
+
 ---
 
 ## 6. The PHP-upgrade blocker (why it needs PHP 7.x today) — NOW MOOT (leaving Mongo)
@@ -373,3 +405,56 @@ upgrade — Doctrine ORM is Symfony's first-class path and already in `composer.
 ### 12.4 Mongo encryption (only relevant if we ever stayed on Mongo)
 In transit: mongod native TLS (Community supports). At rest: Community has none → LUKS, or use
 **Percona Server for MongoDB** (free at-rest encryption). N/A under the Postgres decision.
+
+---
+
+## 13. New Phantasos — build design (decided 2026-10-25)
+
+**Repo/branches:** `master` tagged `legacy-final` (old code: `git show legacy-final:<path>`). New code is built
+on `php8_upgrade`, which merges into **`main`** (new default branch; `master` retires).
+
+**Stack:** Symfony 7.4 LTS on PHP 8.4, based on `cta-symfony-starter`, with the newer layout from
+ORMed2/healthed-training (Pico CSS, `_navbar`/`_sidebar`/`_tab_bar`/`_flashes`/macros, slide-out help panel).
+Doctrine ORM on Percona PG (`appdev-pg-prod`, db `phantasos`). **Symfony Messenger with the Doctrine
+transport** (queue = PG table) — RabbitMQ is retired.
+
+**Database (created 2026-10-25):** `phantasos` on `appdev-pg-prod.apps.cascadetech.org`, single role
+`phantasos` (owner; used by the app, migrations and the import — one role keeps dev workflow simple).
+Verified: TLS 1.3 with `sslmode=verify-full&sslrootcert=system`, `default_table_access_method = tde_heap`
+(new tables encrypted). Connection strings live only in gitignored files: `.env.prod.local` (Symfony,
+`APP_ENV=prod`) and `migration/secrets/new-pg.env` (import tooling). PHPUnit and fixtures stay on the
+local container (port 5448) — never point the test suite at prod. Prod DB is for migrations, import
+rehearsals (disposable until cutover) and live traffic.
+
+**Hosting:** dedicated VM `phantasos.apps.cascadetech.org` (.21), **not k8s** (large volume + RWX).
+Alpine containers following the team pattern (`alpine:3` + `php84` packages, non-root, FPM_MAX_CHILDREN):
+`nginx`, `php-fpm`, `worker` (same image, runs `messenger:consume`), with ffmpeg in the image. `/media`
+(LUKS) is bind-mounted; SELinux context is set once on the host — **never `:Z`**. Images go to Harbor
+(Trivy). Differences from the team pattern for an ePHI service: Composer is fetched with TLS verification,
+and secrets are injected at runtime (not baked into the image via `.env`).
+
+**Network/TLS:** public 443 directly on .21; Let's Encrypt via Route53 DNS-01 with one cert for **both**
+`phantasos.apps.cascadetech.org` (testing) and `phantasos.mesd.k12.or.us` (after the DNS flip). TBC that
+Route53 hosts the `mesd.k12.or.us` zone. Envoy/WAF is a later option (exempt the large upload/download
+bodies). Admin UI is reachable from internal networks only; nginx exposes `/api` publicly, with limits.
+
+**API contract = exact parity** (consumers change nothing; keys are imported unchanged):
+- Endpoints: `requestUploadTicket`, `uploadMedia/{ticketId}` (browser, CORS), `mediaInfo`, `requestMedia`.
+- Key accepted in the query string (legacy) **or** a header. **Ownership enforced on every read.**
+- `mediaInfo` file order: **original first**, then derived files in creation order (frontends use
+  `mediaFiles[0]` for images/audio) → `media_file.position` column.
+- `requestMedia`: PHP authorizes, nginx streams via **X-Accel-Redirect** (sendfile + Range).
+- Upload URL is built from the request host → works on both hostnames.
+- Audit log of every file access/issuance (starter's AuditLogger).
+
+**Processor parity:** Image → thumbnail/small/medium/large PNG; PDF → none; Word → output.html;
+Excel → output.html + output.csv; Audio → mp3 (drop .oga); Video → small/large .mp4 + -frame.png
+(**drop .webm/.ogv**: consumers list small.mp4/webm/ogv as `<source>`s and browsers pick mp4).
+
+**Phase 2 (after cutover, opt-in):** signed short-lived URLs (nginx `secure_link`) so browsers fetch
+directly without the API key; HLS adaptive ladder for video.
+
+**Migration & cutover:** the per-key, re-runnable Mongo→PG import (renames Events→HealthEdTrainingsMESD,
+NurseDocsDev→DocGuard; `storage_key` = old ObjectId hex so file paths never change; skips abandoned
+upload tickets with no files) + rsync of /media. Test on the new hostname (test writes are disposable).
+Cutover: stop the old web server → final rsync (`--delete`) + full re-import → DNS flip → monitor 1h.

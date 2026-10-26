@@ -1,0 +1,35 @@
+# Local PostgreSQL for development and the test suite.
+#
+#   docker compose -f docker-compose-dev-db.yml up -d     start (data kept in a named volume)
+#   docker compose -f docker-compose-dev-db.yml down      stop (data kept)
+#
+# The test suite uses the same server with a `_test` database-name suffix
+# (config/packages/doctrine.yaml, when@test).
+#
+# Port 5448 — this machine's other projects already use 5433–5446 for their local
+# databases; a collision would silently point one project at another's schema.
+#
+# Plain postgres, not Percona with pg_tde: encryption at rest is a property of the
+# server's storage, and nothing in the app depends on it.
+name: phantasos-dev
+
+services:
+  dev_db:
+    image: postgres:17-alpine
+    container_name: phantasos-dev-db
+    environment:
+      POSTGRES_USER: phantasos_dev
+      POSTGRES_PASSWORD: phantasos_dev
+      POSTGRES_DB: phantasos_dev
+    ports:
+      - "5448:5432"
+    volumes:
+      - phantasos_dev_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U phantasos_dev -d phantasos_dev"]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  phantasos_dev_data:

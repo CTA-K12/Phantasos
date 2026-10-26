@@ -1,0 +1,227 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Sign In — CTA App{% endblock %}
+
+{% block stylesheets %}
+<style>
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ── Layout shell ── */
+.pp-login-wrap {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* ── Left: sign-in content ── */
+.pp-login-left {
+    flex: 0 0 42%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 3rem 4rem;
+    background: #fff;
+}
+
+.pp-login-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    max-width: 380px;
+}
+
+.pp-login-logo {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 1.75rem;
+}
+
+.pp-login-logo-name {
+    font-size: 1.55rem;
+    font-weight: 700;
+    color: #1a1a2e;
+    letter-spacing: -0.02em;
+    line-height: 1;
+}
+
+.pp-login-tagline {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #7a5af8;
+    margin-bottom: 0.65rem;
+    line-height: 1.3;
+}
+
+.pp-login-desc {
+    font-size: 0.9rem;
+    color: #6b7280;
+    margin-bottom: 2rem;
+    line-height: 1.65;
+}
+
+.pp-login-google-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.65rem 1.4rem;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fff;
+    color: #111827;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    width: fit-content;
+}
+
+.pp-login-google-btn:hover {
+    border-color: #7a5af8;
+    box-shadow: 0 0 0 3px rgba(122, 90, 248, 0.12);
+    color: #111827;
+    text-decoration: none;
+}
+
+.pp-login-attr {
+    margin-top: 1.25rem;
+    font-size: 0.78rem;
+    color: #9ca3af;
+    margin-bottom: 0;
+}
+
+.pp-login-copy {
+    font-size: 0.75rem;
+    color: #d1d5db;
+    margin: 0;
+}
+
+/* ── Right: decorative panel ── */
+.pp-login-right {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    background-color: #ede9fe;
+    background-image: radial-gradient(circle, #c4b5fd 1px, transparent 1px);
+    background-size: 28px 28px;
+}
+
+.pp-login-right svg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+
+/* ── Mobile: collapse right panel ── */
+@media (max-width: 768px) {
+    .pp-login-wrap  { flex-direction: column; }
+    .pp-login-left  { flex: none; padding: 2.5rem 1.75rem; min-height: 100vh; }
+    .pp-login-right { display: none; }
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="pp-login-wrap">
+
+    {# ── Left: sign-in content ── #}
+    <div class="pp-login-left">
+        <div class="pp-login-content">
+
+            {# Logo #}
+            <div class="pp-login-logo">
+                <i data-lucide="layers" style="width:30px;height:30px;color:#7a5af8;flex-shrink:0;"></i>
+                <span class="pp-login-logo-name">CTA App</span>
+            </div>
+
+            {# Tagline — update this for your app #}
+            <p class="pp-login-tagline">Your application tagline here.</p>
+
+            {# Description — update this for your app #}
+            <p class="pp-login-desc">
+                A Cascade Technology Alliance application.
+                Sign in with your CTA Google account to get started.
+            </p>
+
+            {# Flash messages #}
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} mb-3" role="alert"
+                         style="font-size:0.875rem;border-radius:8px;">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            {# Google sign-in #}
+            <a href="{{ path('app_login_google') }}" class="pp-login-google-btn">
+                <svg width="20" height="20" viewBox="0 0 48 48">
+                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+                </svg>
+                Continue with Google
+            </a>
+
+            <p class="pp-login-attr">Powered by the Cascade Technology Alliance</p>
+        </div>
+
+        <p class="pp-login-copy">© {{ "now"|date("Y") }} Cascade Technology Alliance</p>
+    </div>
+
+    {# ── Right: Lucide "layers" icon scaled up as decoration ── #}
+    <div class="pp-login-right">
+        {#
+            These are the exact 3 SVG paths from the Lucide "layers" icon
+            (extracted from the live rendered icon in the logo).
+
+            Scaled 28× and translated to centre the icon's midpoint (12, 12)
+            at the panel's visual centre (340, 450):
+              transform="translate(4, 114) scale(28)"
+
+            Original 24×24 viewBox paths:
+              Path 1 — filled top plate
+              Path 2 — middle layer open chevron (y≈12–16.8)
+              Path 3 — bottom layer open chevron (y≈17–21.9)
+        #}
+        <svg viewBox="0 0 680 900" xmlns="http://www.w3.org/2000/svg"
+             preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+            <defs>
+                <radialGradient id="bg-glow" gradientUnits="userSpaceOnUse"
+                                cx="340" cy="450" r="300">
+                    <stop offset="0%"   stop-color="#7a5af8" stop-opacity="0.14"/>
+                    <stop offset="100%" stop-color="#7a5af8" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="plate-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#a78bfa"/>
+                    <stop offset="100%" stop-color="#7a5af8"/>
+                </linearGradient>
+            </defs>
+
+            <!-- Ambient glow -->
+            <rect width="680" height="900" fill="url(#bg-glow)"/>
+
+            <!-- Lucide layers icon — exact paths, scale(28), centred at (340, 450) -->
+            <g transform="translate(4, 114) scale(28)">
+                <!-- Top plate — moved down 2.5 units toward centre -->
+                <path transform="translate(0, 2.5)"
+                      d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"
+                      fill="none" stroke="#7a5af8" stroke-width="0.11"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0.32"/>
+                <!-- Middle layer chevron — unchanged -->
+                <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"
+                      fill="none" stroke="#7a5af8" stroke-width="0.11"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0.32"/>
+                <!-- Bottom layer chevron — moved up 2.5 units toward centre -->
+                <path transform="translate(0, -2.5)"
+                      d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"
+                      fill="none" stroke="#7a5af8" stroke-width="0.11"
+                      stroke-linecap="round" stroke-linejoin="round" opacity="0.32"/>
+            </g>
+        </svg>
+    </div>
+
+</div>
+{% endblock %}

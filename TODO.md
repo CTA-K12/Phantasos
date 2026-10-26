@@ -42,7 +42,22 @@ Status keys: `[ ]` todo · `[~]` in progress · `[x]` done · `[?]` needs decisi
 - [x] **Measured on-disk footprint** of ORSkills (2026-05-31): **638 G** across **40,189** existing
       leaf dirs (6,399 never uploaded). That's ~85% of the 748 G store → purge drops `/media` to
       ~110 G. Staged on server at `/root/orskills_purge/` (leaf_dirs.txt md5-verified, delete_files.sh).
-- [ ] **Review** manifest + measure output before deleting anything.
+- [x] **Review** manifest + measure output before deleting anything.
+- [x] **Scope expanded (2026-10-25)** to 10 retired keys: ORSkills, ORSkills-Dev, oforral-orskills,
+      ORSkills-Sandbox, Subdocs-tyhand, NWPromiseTeacherApplication, Paradocs, VaccineTracking, Migrant,
+      ORMed Training → `manifest_retire/` (47,291 media · 50,621 mediaFile).
+- [x] **Pilot (2026-10-25)**: 7 leaf dirs deleted, each sharing a parent dir with a SubDocs/NurseDocsDev
+      canary — all canaries intact, parents intact.
+- [x] **Files deleted (2026-10-25)**: 40,578 leaf dirs removed in ~2 min; `/media` 752 G → **113 G**.
+      Verified all 39,486 kept-app leaf dirs still present (0 missing) + canaries OK.
+- [x] **Mongo cleanup (2026-10-25)**: deleted 47,291 media + 50,621 mediaFile docs; 10 retired keys
+      deactivated. Verified: only SubDocs, NurseDocsDev (DocGuard), Events, Training,
+      HealthedTrainingsNWRESD remain — **64,013 media / 43,350 mediaFile**, all 5 keys active.
+- [ ] Optional tidy: remove `/root/orskills_purge` + `/root/retire_purge` id lists on the old server.
+
+## ⚠️ Priority: migrate ASAP
+Old server (PHP 5.6.8) is exposed to an unpatchable PHP RCE class of vuln. **No code fixes on the old
+system** — all hardening (ownership check, header-based keys, CORS) goes into the new system.
 - [ ] **Execute purge** (after backup decision): `delete_files.sh delete` on server, then
       `purge_app.py --apply` for Mongo docs.
 - [ ] **Verify**: `inspect_db.py` shows ORSkills media/mediaFile = 0; spot-check leaf dirs gone.
