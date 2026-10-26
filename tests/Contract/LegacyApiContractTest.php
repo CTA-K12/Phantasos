@@ -133,7 +133,8 @@ class LegacyApiContractTest extends WebTestCase
         self::assertSame($data['response']['raw'], $this->body());
     }
 
-    public function testRenamedClientStillReportsLegacyOwner(): void
+    /** Renamed clients (Events → HealthEdTrainingsMESD) report their current name as owner. */
+    public function testRenamedClientReportsCurrentName(): void
     {
         $data = self::fixture('mediaInfo_Events_pdf');
         $id   = $data['request']['params']['media_id'];
@@ -144,7 +145,10 @@ class LegacyApiContractTest extends WebTestCase
 
         $this->get('/api/mediaInfo', ['media_id' => $id], $this->keys['Events']);
 
-        self::assertSame($data['response']['raw'], $this->body());
+        self::assertSame(
+            str_replace('"owner":"Events"', '"owner":"HealthEdTrainingsMESD"', $data['response']['raw']),
+            $this->body(),
+        );
     }
 
     public function testMediaInfoAcceptsKeyInHeader(): void

@@ -24,6 +24,12 @@ class AuditLogger
         'data.purged'             => 'Data Purged',
         'media.served'            => 'Media File Served',
         'media.uploaded'          => 'Media Uploaded',
+        'media.reprocessed'       => 'Media Reprocessed',
+        'client.created'          => 'API Client Created',
+        'client.updated'          => 'API Client Updated',
+        'client.key_rotated'      => 'API Key Rotated',
+        'client.activated'        => 'API Client Activated',
+        'client.deactivated'      => 'API Client Deactivated',
     ];
 
     public function __construct(

@@ -1,0 +1,72 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}{{ client.name }} — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{{ path('admin_client_index') }}">Clients &amp; Keys</a></li>
+    <li>{{ client.name }}</li>
+{% endblock %}
+{% block breadcrumb_actions %}
+    <a role="button" href="{{ path('admin_client_edit', {id: client.id}) }}" class="breadcrumb-action-btn secondary">{{ macros.icon('edit') }} Edit</a>
+{% endblock %}
+
+{% block body %}
+<div class="stat-row">
+    <article><span class="stat-value">{{ stats ? stats.media|number_format : 0 }}</span><span class="stat-label">media</span></article>
+    <article><span class="stat-value">{{ stats ? stats.ready|number_format : 0 }}</span><span class="stat-label">ready</span></article>
+    <article><span class="stat-value">{{ stats and stats.lastUpload ? stats.lastUpload|date('M j, Y') : '—' }}</span><span class="stat-label">last upload</span></article>
+    <article><span class="stat-value">{{ client.lastUsedAt ? client.lastUsedAt|date('M j, Y') : 'never' }}</span><span class="stat-label">key last used (hourly resolution)</span></article>
+</div>
+
+<div class="row">
+    <div class="col-xs-12 col-md-7">
+        <article>
+            <header><strong>{{ client.name }}</strong>
+                {% if client.active %}<span class="pill pill--ok">Active</span>{% else %}<span class="pill pill--off">Inactive</span>{% endif %}
+            </header>
+            <dl class="facts">
+                {% if client.legacyName and client.legacyName != client.name %}
+                    <dt>Legacy name</dt><dd>{{ client.legacyName }} <small class="muted">(imported from the old system)</small></dd>
+                {% endif %}
+                <dt>Description</dt><dd>{{ client.description ?: '—' }}</dd>
+                <dt>Contact</dt><dd>{{ client.contactName ?: '—' }}{% if client.contactEmail %} &lt;{{ client.contactEmail }}&gt;{% endif %}</dd>
+                <dt>Created</dt><dd>{{ client.createdAt|date('M j, Y') }}</dd>
+                <dt>Key fingerprint</dt><dd><span class="mono">{{ client.keyHash|slice(0, 12) }}</span>
+                    <small class="muted">— first 12 of the key's SHA-256, for matching a key someone holds</small></dd>
+            </dl>
+        </article>
+    </div>
+    <div class="col-xs-12 col-md-5">
+        <article>
+            <header><strong>Key</strong></header>
+            <p class="muted">Rotating issues a new key and stops the current one immediately.</p>
+            {{ macros.confirmActionButton(
+                path('admin_client_rotate', {id: client.id}), csrf_token('client-rotate-' ~ client.id),
+                'Rotate key', 'Rotate the API key for ' ~ client.name ~ '?',
+                'The current key stops working immediately. ' ~ client.name ~ ' will be refused until its configuration has the new key.',
+                'Rotate key', 'warning', true) }}
+
+            <hr>
+            {% if client.active %}
+                <p class="muted">Deactivating refuses every request with this key until it is reactivated. Media is kept.</p>
+                {{ macros.confirmActionButton(
+                    path('admin_client_toggle', {id: client.id}), csrf_token('client-toggle-' ~ client.id),
+                    'Deactivate', 'Deactivate ' ~ client.name ~ '?',
+                    'All requests with its key will be refused (403) until it is reactivated. Its media is kept.',
+                    'Deactivate', 'danger', true) }}
+            {% else %}
+                {{ macros.confirmActionButton(
+                    path('admin_client_toggle', {id: client.id}), csrf_token('client-toggle-' ~ client.id),
+                    'Reactivate', 'Reactivate ' ~ client.name ~ '?',
+                    'Its existing key will be accepted again.',
+                    'Reactivate', 'success', true) }}
+            {% endif %}
+        </article>
+    </div>
+</div>
+
+<article>
+    <header><strong>Recent uploads</strong></header>
+    {{ include('admin/_media_table.html.twig', {media: recent, show_client: false}) }}
+</article>
+{% endblock %}

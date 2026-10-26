@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+{# Minimal shell for pages shown before sign-in (login, pending approval, dev login). #}
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>{% block title %}{{ app_name }}{% endblock %}</title>
+        <link rel="icon" href="{{ asset('images/favicon.png') }}">
+        <link rel="stylesheet" href="{{ asset('css/pico2.0.6.min.css') }}">
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        {% block body %}{% endblock %}
+    </body>
+</html>

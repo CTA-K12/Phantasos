@@ -41,7 +41,7 @@ class MediaInfoPresenter
         }
 
         return [
-            'owner'                 => $media->getClient()->getPublicOwnerName(),
+            'owner'                 => $media->getClient()->getName(),
             'type'                  => $media->getMediaType()?->value,
             'original_exists'       => $originalExists,
             'tags'                  => $media->getTags(),

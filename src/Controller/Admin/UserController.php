@@ -103,7 +103,7 @@ class UserController extends AbstractController
         $user = $this->findUserOr404($id);
 
         if (!$this->isCsrfTokenValid('toggle-user-' . $id, $request->request->getString('_token'))) {
-            $this->addFlash('danger', 'Invalid security token.');
+            $this->addFlash('error', 'Invalid security token.');
 
             return $this->redirectToRoute('admin_user_index');
         }

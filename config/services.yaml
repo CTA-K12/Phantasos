@@ -9,6 +9,8 @@
 parameters:
     # Defaults so a missing variable never breaks a boot; production sets these in
     # .docker/php/env.defaults / the host env file.
+    env(APP_NAME): 'Phantasos'
+    env(TRUSTED_HOSTS): '^(phantasos\.mesd\.k12\.or\.us|phantasos\.apps\.cascadetech\.org)$'
     env(MEDIA_ROOT): '%kernel.project_dir%/var/media'
     env(MEDIA_ACCEL_PREFIX): ''
     env(FFMPEG_BINARY): 'ffmpeg'

@@ -29,6 +29,15 @@ class ApiClientRepository extends ServiceEntityRepository
         return $this->findOneBy(['keyHash' => ApiClient::hashKey($apiKey), 'isActive' => true]);
     }
 
+    /** @return list<ApiClient> */
+    public function findAllOrdered(): array
+    {
+        /** @var list<ApiClient> */
+        return $this->createQueryBuilder('c')
+            ->orderBy('c.isActive', 'DESC')->addOrderBy('LOWER(c.name)', 'ASC')
+            ->getQuery()->getResult();
+    }
+
     public function flush(): void
     {
         $this->getEntityManager()->flush();

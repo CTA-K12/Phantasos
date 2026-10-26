@@ -1,0 +1,52 @@
+{# Flash message display, ported from ORMed v2's templates/_flashes.html.twig.
+
+   Renders any addFlash('type', '...') calls sitting in the session bag.
+   `app.flashes` clears what it reads, so each message shows on exactly one page
+   load. Every flash is a freshly rendered element, so the slide-in animation
+   replays each time one appears — even when the text is identical to last time.
+
+   Fetches four named types rather than bare `app.flashes`, which is
+   FlashBag::all() and would get AND clear every type in the bag. That matters as
+   soon as anything uses the bag to pass a non-user-facing signal between
+   requests (ORMed uses an `openTab` key that way): this partial renders before
+   {% block body %}, so an indiscriminate read here would wipe such a signal
+   before its real consumer ever saw it. Nothing in HealthEd does that today —
+   this keeps the door open.
+
+   To add a type, add a key to BOTH _flash_types below and the fetch list.
+   Supported: success | warning | error | info. #}
+{% import 'macros.html.twig' as macros %}
+{% set _flash_types = {
+    success: {color: '#22c55e', bg: '#22c55e21', icon: 'check'},
+    warning: {color: '#f59e0b', bg: '#f59e0b21', icon: 'warning'},
+    error:   {color: '#dc2626', bg: '#dc262621', icon: 'x'},
+    info:    {color: '#3b82f6', bg: '#3b82f621', icon: null},
+} %}
+{% set _flash_default = {color: '#525f7a', bg: '#525f7a21', icon: null} %}
+
+{% for type, messages in app.flashes(['success', 'warning', 'error', 'info']) %}
+    {% set meta = _flash_types[type]|default(_flash_default) %}
+    {% for message in messages %}
+        <div class="flash flash--{{ type }}" role="alert"
+             style="margin: 0.5rem 0; padding: 0.75rem 1rem;
+                    border-left: 4px solid {{ meta.color }};
+                    background: {{ meta.bg }};
+                    border-radius: 0 4px 4px 0;
+                    display: flex; align-items: center; gap: 0.75rem;
+                    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);">
+            {% if meta.icon %}
+                <span style="color: {{ meta.color }}; display: flex; flex-shrink: 0;">
+                    {{ macros.icon(meta.icon) }}
+                </span>
+            {% endif %}
+            <span style="flex: 1; font-weight: 600;">{{ message }}</span>
+            <button type="button" aria-label="Dismiss"
+                    style="background: transparent; border: none; cursor: pointer;
+                           font-size: 1.25rem; line-height: 1; padding: 0 0.25rem;
+                           color: var(--pico-secondary, inherit); margin: 0; width: auto;"
+                    onclick="this.parentElement.remove();">
+                &times;
+            </button>
+        </div>
+    {% endfor %}
+{% endfor %}

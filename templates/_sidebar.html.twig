@@ -1,0 +1,50 @@
+{% import 'macros.html.twig' as macros %}
+{# Layout from ORMed v2: brand at the top, nav in the middle, signed-in user pinned at
+   the bottom. `stems` keep an item lit on its section's sub-pages (view/edit). #}
+<aside>
+    <a class="sidebar-brand" href="{{ path('app_dashboard') }}">
+        <img src="{{ asset('images/cta-logo.png') }}" alt="{{ app_name }}">
+        <span class="sidebar-brand__text">{{ app_name }}</span>
+    </a>
+    <nav>
+        <ul>
+            {% set nav = [
+                { route: 'app_dashboard', stems: ['app_dashboard'], icon: 'dashboard', label: 'Dashboard' },
+            ] %}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% set nav = nav|merge([
+                    { route: 'admin_client_index',     stems: ['admin_client'],     icon: 'key',        label: 'Clients & Keys' },
+                    { route: 'admin_processing_index', stems: ['admin_processing'], icon: 'warning',    label: 'Processing', badge: processing_problem_count() },
+                    { route: 'admin_user_index',       stems: ['admin_user'],       icon: 'users',      label: 'Users' },
+                    { route: 'admin_audit_index',      stems: ['admin_audit'],      icon: 'log',        label: 'Audit Log' },
+                ]) %}
+            {% endif %}
+
+            {% set current = app.request.attributes.get('_route')|default('') %}
+            {% for item in nav %}
+                {% set active = item.stems|filter(stem => stem in current)|length > 0 %}
+                <li {% if active %}class="active"{% endif %}>
+                    <a href="{{ path(item.route) }}">{{ macros.icon(item.icon) }}<span>{{ item.label }}</span>
+                        {%- if item.badge is defined and item.badge > 0 %}<span class="nav-badge" aria-label="{{ item.badge }} need attention">{{ item.badge }}</span>{% endif -%}
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </nav>
+
+    {% if app.user %}
+        <div class="sidebar-footer">
+            {{ macros.avatar(app.user, 'sm') }}
+            <span class="sidebar-footer__info">
+                <span class="sidebar-footer__name">{{ app.user.displayName }}</span>
+                <span class="sidebar-footer__email">{{ app.user.email }}</span>
+            </span>
+            <form method="POST" action="{{ path('app_logout') }}" class="sidebar-footer__action">
+                <button type="submit" class="sidebar-footer__action-btn" aria-label="Sign out"
+                        data-tooltip="Sign out" data-placement="top">
+                    {{ macros.icon('rightFromBracket') }}
+                </button>
+            </form>
+        </div>
+    {% endif %}
+</aside>

@@ -11,7 +11,7 @@ class AppExtensionTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->ext = new AppExtension();
+        $this->ext = new AppExtension($this->createStub(\App\Repository\MediaRepository::class));
     }
 
     // ─────────────────────────────────────────────────────────────

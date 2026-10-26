@@ -1,0 +1,43 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}API key — {{ client.name }} — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{{ path('admin_client_index') }}">Clients &amp; Keys</a></li>
+    <li><a href="{{ path('admin_client_view', {id: client.id}) }}">{{ client.name }}</a></li>
+    <li>{{ event == 'rotated' ? 'New key' : 'Key' }}</li>
+{% endblock %}
+
+{% block body %}
+<article class="key-reveal">
+    <header>
+        <strong>{{ macros.icon('warning') }}
+            {% if event == 'rotated' %}New API key for {{ client.name }}{% else %}{{ client.name }} created{% endif %}
+        </strong>
+    </header>
+
+    <p>Copy this key now. <strong>It will not be shown again</strong> — Phantasos keeps only a hash of it.
+    If it is lost, rotate the key and give the client the new one.</p>
+
+    <div class="key-value">
+        <input type="text" id="api-key" value="{{ key }}" readonly aria-label="API key" autocomplete="off" spellcheck="false"
+               onclick="this.select()">
+        <button type="button" class="secondary"
+                onclick="navigator.clipboard.writeText(document.getElementById('api-key').value).then(() => { this.textContent = 'Copied'; })">
+            Copy
+        </button>
+    </div>
+
+    {% if event == 'rotated' %}
+        <p><strong>The previous key no longer works.</strong> Until the client's configuration is updated with this key,
+        its requests will be refused.</p>
+    {% endif %}
+
+    <p class="muted">Send it to the client through a secure channel (not plain email or chat). Clients should send it in
+    the <code>X-Api-Key</code> header; the legacy <code>apikey</code> query parameter also works.</p>
+
+    <footer>
+        <a role="button" href="{{ path('admin_client_view', {id: client.id}) }}">Done</a>
+    </footer>
+</article>
+{% endblock %}

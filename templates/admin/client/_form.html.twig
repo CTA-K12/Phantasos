@@ -1,0 +1,13 @@
+{{ form_start(form) }}
+    {{ form_row(form.name) }}
+    {{ form_row(form.description) }}
+    <div class="grid">
+        <div>{{ form_row(form.contactName) }}</div>
+        <div>{{ form_row(form.contactEmail) }}</div>
+    </div>
+    {{ form_rest(form) }}
+    <div style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+        <a role="button" class="secondary outline" href="{{ cancel_url }}">Cancel</a>
+        <button type="submit" style="width: auto;">{{ submit_label }}</button>
+    </div>
+{{ form_end(form) }}

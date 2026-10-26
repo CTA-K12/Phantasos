@@ -116,4 +116,13 @@ class AuditLogRepository extends ServiceEntityRepository
             $this->getEntityManager()->flush();
         }
     }
+
+    public function countActionSince(string $action, \DateTimeImmutable $since): int
+    {
+        return (int) $this->createQueryBuilder('a')
+            ->select('COUNT(a.id)')
+            ->where('a.action = :action')->andWhere('a.createdAt >= :since')
+            ->setParameter('action', $action)->setParameter('since', $since)
+            ->getQuery()->getSingleScalarResult();
+    }
 }

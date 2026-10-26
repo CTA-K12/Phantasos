@@ -1,0 +1,56 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}Clients & Keys — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}<li>Clients &amp; Keys</li>{% endblock %}
+{% block breadcrumb_actions %}
+    <a role="button" href="{{ path('admin_client_new') }}" class="breadcrumb-action-btn">{{ macros.icon('plus') }} New Client</a>
+{% endblock %}
+
+{% block body %}
+<article>
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr>
+                    <th>Actions</th>
+                    <th>Name</th>
+                    <th>Status</th>
+                    <th>Media</th>
+                    <th>Last upload</th>
+                    <th>Key last used</th>
+                    <th>Contact</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for client in clients %}
+                    {% set s = stats[client.id.toRfc4122] ?? null %}
+                    <tr>
+                        <td>
+                            <div class="icon-btn-group">
+                                {{ macros.iconBtn('view', 'View', path('admin_client_view', {id: client.id})) }}
+                                {{ macros.iconBtn('edit', 'Edit', path('admin_client_edit', {id: client.id})) }}
+                            </div>
+                        </td>
+                        <td>
+                            <a href="{{ path('admin_client_view', {id: client.id}) }}"><strong>{{ client.name }}</strong></a>
+                            {% if client.legacyName and client.legacyName != client.name %}
+                                <br><small class="muted">was {{ client.legacyName }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if client.active %}<span class="pill pill--ok">Active</span>{% else %}<span class="pill pill--off">Inactive</span>{% endif %}
+                        </td>
+                        <td>{{ s ? s.media|number_format : 0 }}</td>
+                        <td>{{ s and s.lastUpload ? s.lastUpload|date('M j, Y') : '—' }}</td>
+                        <td>{{ client.lastUsedAt ? client.lastUsedAt|date('M j, Y g:ia') : 'never' }}</td>
+                        <td>{{ client.contactName ?: '' }}{% if client.contactEmail %}<br><small class="muted">{{ client.contactEmail }}</small>{% endif %}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="7"><em>No clients yet.</em></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </figure>
+</article>
+{% endblock %}

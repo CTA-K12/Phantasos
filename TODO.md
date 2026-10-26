@@ -75,11 +75,13 @@ Done 2026-10-25 (working tree on `php8_upgrade`):
       local end-to-end smoke test passed. Quadlet units in `deploy/quadlet/`.
 
 Open:
-- [?] **Word/Excel processors**: not built (0 such media in current data; Office parsers are a CVE
-      magnet). Uploads of those types now get 400. Decide: keep unsupported, or add them.
-- [ ] Admin UI: port layout/help panel from ORMed2/healthed-training (Pico); key management
-      (create/rotate/deactivate, per-environment keys), media browser, failed-queue view.
-- [ ] Phantasos Google OAuth client (admin UI); restrict admin UI to internal networks.
+- [x] Word/Excel: not supported (decided 2026-10-25). Revisit with ORMed (docx/xlsx attachments).
+- [x] Management UI (2026-10-25): ORMed v2 layout + help panel; Clients & Keys (create/rotate/
+      deactivate, key shown once); Processing (failed/stuck + retry); dashboard; nginx allowlist.
+- [ ] Media browser (search by client/media ID, view files; audit each view).
+- [ ] Phantasos Google OAuth client for the management site; add the real admin users.
+- [?] Management-site allowlist: confirm which source ranges staff arrive from at .21 (private
+      ranges are the default; if traffic is NATed to MESD/NWRESD public IPs, list those).
 - [ ] Build/push script for Harbor (`appdev-phi`), image tags; Trivy scan clean.
 - [ ] Retention for `audit_log` (`media.served` ≈ 7k rows/day) and `messenger_messages` failed queue.
 - [ ] Monitoring: worker liveness, failed-message count, disk usage on /media.

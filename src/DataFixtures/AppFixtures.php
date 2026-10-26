@@ -6,12 +6,21 @@ use App\Entity\AppSetting;
 use App\Entity\AuditLog;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
     public function load(ObjectManager $manager): void
     {
+        // doctrine:fixtures:load empties every table before this runs. Refuse anything but
+        // a local database, so it can never wipe appdev-pg-prod (imported media, users).
+        // (The purge has already happened by the time load() runs on a remote host, so the
+        // real guard is the event listener in FixturesGuard; this is a second line.)
+        if ($manager instanceof EntityManagerInterface) {
+            FixturesGuard::assertLocal($manager->getConnection()->getParams());
+        }
+
         // ── Users ─────────────────────────────────────────────────────────────
         $userData = [
             ['dcramble@mesd.k12.or.us', null, 'dcramble',        ['ROLE_ADMIN'],      true],

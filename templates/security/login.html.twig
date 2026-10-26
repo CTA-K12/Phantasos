@@ -1,6 +1,6 @@
-{% extends 'base.html.twig' %}
+{% extends 'public.html.twig' %}
 
-{% block title %}Sign In — CTA App{% endblock %}
+{% block title %}Sign In — {{ app_name }}{% endblock %}
 
 {% block stylesheets %}
 <style>
@@ -131,24 +131,24 @@
 
             {# Logo #}
             <div class="pp-login-logo">
-                <i data-lucide="layers" style="width:30px;height:30px;color:#7a5af8;flex-shrink:0;"></i>
-                <span class="pp-login-logo-name">CTA App</span>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#7a5af8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m10 9 5 3-5 3z"/></svg>
+                <span class="pp-login-logo-name">{{ app_name }}</span>
             </div>
 
-            {# Tagline — update this for your app #}
-            <p class="pp-login-tagline">Your application tagline here.</p>
+            <p class="pp-login-tagline">Media for every CTA application.</p>
 
-            {# Description — update this for your app #}
             <p class="pp-login-desc">
-                A Cascade Technology Alliance application.
-                Sign in with your CTA Google account to get started.
+                Manage the applications that store and serve files through Phantasos:
+                their API keys, processing and audit trail. Sign in with your CTA Google account.
             </p>
 
             {# Flash messages #}
             {% for type, messages in app.flashes %}
                 {% for message in messages %}
-                    <div class="alert alert-{{ type == 'error' ? 'danger' : type }} mb-3" role="alert"
-                         style="font-size:0.875rem;border-radius:8px;">
+                    <div role="alert"
+                         style="font-size:0.875rem;border-radius:8px;padding:0.75rem 1rem;margin-bottom:1rem;
+                                background:{{ type == 'error' ? '#dc262621' : '#3b82f621' }};
+                                border-left:4px solid {{ type == 'error' ? '#dc2626' : '#3b82f6' }};">
                         {{ message }}
                     </div>
                 {% endfor %}
@@ -171,54 +171,25 @@
         <p class="pp-login-copy">© {{ "now"|date("Y") }} Cascade Technology Alliance</p>
     </div>
 
-    {# ── Right: Lucide "layers" icon scaled up as decoration ── #}
+    {# ── Right: decorative panel ── #}
     <div class="pp-login-right">
-        {#
-            These are the exact 3 SVG paths from the Lucide "layers" icon
-            (extracted from the live rendered icon in the logo).
-
-            Scaled 28× and translated to centre the icon's midpoint (12, 12)
-            at the panel's visual centre (340, 450):
-              transform="translate(4, 114) scale(28)"
-
-            Original 24×24 viewBox paths:
-              Path 1 — filled top plate
-              Path 2 — middle layer open chevron (y≈12–16.8)
-              Path 3 — bottom layer open chevron (y≈17–21.9)
-        #}
-        <svg viewBox="0 0 680 900" xmlns="http://www.w3.org/2000/svg"
-             preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+        {# Media motif: a play frame, an image frame and a waveform, outline only at the
+           shared 0.32 opacity over the dot grid (CTA login convention). #}
+        <svg viewBox="0 0 680 900" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
             <defs>
-                <radialGradient id="bg-glow" gradientUnits="userSpaceOnUse"
-                                cx="340" cy="450" r="300">
-                    <stop offset="0%"   stop-color="#7a5af8" stop-opacity="0.14"/>
+                <radialGradient id="bg-glow" gradientUnits="userSpaceOnUse" cx="340" cy="450" r="300">
+                    <stop offset="0%" stop-color="#7a5af8" stop-opacity="0.14"/>
                     <stop offset="100%" stop-color="#7a5af8" stop-opacity="0"/>
                 </radialGradient>
-                <linearGradient id="plate-grad" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#a78bfa"/>
-                    <stop offset="100%" stop-color="#7a5af8"/>
-                </linearGradient>
             </defs>
-
-            <!-- Ambient glow -->
             <rect width="680" height="900" fill="url(#bg-glow)"/>
-
-            <!-- Lucide layers icon — exact paths, scale(28), centred at (340, 450) -->
-            <g transform="translate(4, 114) scale(28)">
-                <!-- Top plate — moved down 2.5 units toward centre -->
-                <path transform="translate(0, 2.5)"
-                      d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"
-                      fill="none" stroke="#7a5af8" stroke-width="0.11"
-                      stroke-linecap="round" stroke-linejoin="round" opacity="0.32"/>
-                <!-- Middle layer chevron — unchanged -->
-                <path d="M2 12a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 12"
-                      fill="none" stroke="#7a5af8" stroke-width="0.11"
-                      stroke-linecap="round" stroke-linejoin="round" opacity="0.32"/>
-                <!-- Bottom layer chevron — moved up 2.5 units toward centre -->
-                <path transform="translate(0, -2.5)"
-                      d="M2 17a1 1 0 0 0 .58.91l8.6 3.91a2 2 0 0 0 1.65 0l8.58-3.9A1 1 0 0 0 22 17"
-                      fill="none" stroke="#7a5af8" stroke-width="0.11"
-                      stroke-linecap="round" stroke-linejoin="round" opacity="0.32"/>
+            <g fill="none" stroke="#7a5af8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.32">
+                <rect x="150" y="250" width="380" height="250" rx="22"/>
+                <path d="M305 320 l90 55 -90 55 z"/>
+                <rect x="210" y="545" width="150" height="110" rx="14"/>
+                <circle cx="245" cy="580" r="13"/>
+                <path d="M210 640 l45 -40 35 30 30 -25 40 35"/>
+                <path d="M395 600 v20 M415 585 v50 M435 570 v80 M455 590 v40 M475 580 v60 M495 600 v20"/>
             </g>
         </svg>
     </div>

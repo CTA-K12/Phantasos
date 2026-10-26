@@ -1,54 +1,25 @@
-{% extends 'layout.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}Dashboard - CTA App{% endblock %}
+{% block title %}Dashboard — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}<li>Dashboard</li>{% endblock %}
 
-{% block content %}
-<div class="row align-items-center mb-4 g-3">
-    <div class="col-12 col-md">
-        <h4 class="mb-0">Dashboard</h4>
-    </div>
+{% block body %}
+<div class="stat-row">
+    <article><span class="stat-value">{{ activeClients }}</span><span class="stat-label">active clients</span></article>
+    <article><span class="stat-value">{{ totalMedia|number_format }}</span><span class="stat-label">media stored</span></article>
+    <article><span class="stat-value">{{ uploadsWeek|number_format }}</span><span class="stat-label">uploads, last 7 days</span></article>
+    <article><span class="stat-value">{{ servedWeek|number_format }}</span><span class="stat-label">files served, last 7 days</span></article>
+    <article><span class="stat-value">{{ queue.waiting + queue.running }}</span><span class="stat-label">in processing queue</span></article>
+    <article>
+        <span class="stat-value">
+            {% if problems > 0 and is_granted('ROLE_ADMIN') %}<a href="{{ path('admin_processing_index') }}">{{ problems }}</a>{% else %}{{ problems }}{% endif %}
+        </span>
+        <span class="stat-label">failed or stuck</span>
+    </article>
 </div>
 
-{#
-    Chart cards grid.
-    The chart_controller.js supports the following chart types via data-chart-type-value:
-      - "donut"  — expects [{label, count, color}]
-      - "line"   — expects [{date, count}]
-      - "bar"    — expects stacked series or [{label/name, count}]
-
-    The data URL endpoint (app_dashboard_data) must return a JSON object.
-    Use data-chart-chart-key-value to specify which key in the JSON response to use.
-
-    Add additional chart cards here — see chart_controller.js for supported types.
-#}
-<div class="row g-3">
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header">Activity by Type</div>
-            <div class="card-body">
-                <div class="chart-container"
-                     data-controller="chart"
-                     data-chart-type-value="donut"
-                     data-chart-data-url-value="{{ path('app_dashboard_data') }}"
-                     data-chart-chart-key-value="activityByType">
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-6">
-        <div class="card h-100">
-            <div class="card-header">Activity by User</div>
-            <div class="card-body">
-                <div class="chart-container"
-                     data-controller="chart"
-                     data-chart-type-value="hbar"
-                     data-chart-data-url-value="{{ path('app_dashboard_data') }}"
-                     data-chart-chart-key-value="activityByUser"
-                     data-chart-row-hover-value="true">
-                </div>
-            </div>
-        </div>
-    </div>
-    {# Add additional chart cards here #}
-</div>
+<article>
+    <header><strong>Recent uploads</strong></header>
+    {{ include('admin/_media_table.html.twig', {media: recent, show_client: true}) }}
+</article>
 {% endblock %}

@@ -1,0 +1,42 @@
+{# Compact media list. Params: media (list<Media>), show_client (bool), actions (optional block of extra cells via retry=true). #}
+<figure>
+    <table role="grid">
+        <thead>
+            <tr>
+                {% if retry|default(false) %}<th>Actions</th>{% endif %}
+                <th>Media ID</th>
+                {% if show_client %}<th>Client</th>{% endif %}
+                <th>Type</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Files</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for m in media %}
+                <tr>
+                    {% if retry|default(false) %}
+                        <td>
+                            {% import 'macros.html.twig' as macros %}
+                            {{ macros.confirmAction(path('admin_processing_retry', {id: m.id}), csrf_token('processing-retry'),
+                                'undo', 'Retry', 'Retry processing ' ~ m.id ~ '?',
+                                'It goes back on the queue and the worker processes the original again.', 'Retry', 'success') }}
+                        </td>
+                    {% endif %}
+                    <td class="mono">{{ m.id }}</td>
+                    {% if show_client %}<td>{{ m.client.name }}</td>{% endif %}
+                    <td>{{ m.mediaType ? m.mediaType.value : '—' }}</td>
+                    <td>
+                        {% set st = m.status.value %}
+                        <span class="pill {{ st == 'Ready' ? 'pill--ok' : (st == 'Failed to process' ? 'pill--bad' : 'pill--warn') }}">{{ st }}</span>
+                        {% if st == 'Processing' %}<small class="muted">{{ m.processingPercentage }}%</small>{% endif %}
+                    </td>
+                    <td>{{ m.createdAt|date('M j, Y g:ia') }}</td>
+                    <td>{{ m.files|length }}{% if m.originalFile %} <small class="muted">({{ m.originalFile.contentType }})</small>{% endif %}</td>
+                </tr>
+            {% else %}
+                <tr><td colspan="7"><em>None.</em></td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</figure>

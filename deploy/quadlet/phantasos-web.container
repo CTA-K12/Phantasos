@@ -15,6 +15,9 @@ PublishPort=80:8080
 Volume=/media/phantasos:/media/phantasos:ro
 # fullchain.pem + privkey.pem (Let's Encrypt; the cert covers both hostnames).
 Volume=/etc/phantasos/tls:/etc/nginx/tls:ro
+# Optional: who may reach the management site (everything but /api/). Default in the
+# image is private ranges only; uncomment to override.
+#Volume=/etc/phantasos/admin-access.conf:/etc/nginx/admin-access.conf:ro
 NoNewPrivileges=true
 DropCapability=ALL
 LogDriver=journald

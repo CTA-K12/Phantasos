@@ -1,0 +1,1846 @@
+  /* NOTE: <aside> deliberately has no overflow of its own. theme.css makes it a
+     full-height flex column and `aside nav` is the single scroller. A second
+     scroller here also caused a horizontal scrollbar: setting overflow-y while
+     leaving overflow-x `visible` makes the computed overflow-x `auto` (CSS
+     Overflow spec), so nowrap labels wider than the sidebar produced one. */
+
+  :root {
+    --card-background-color: #ffffff;
+    --info-text-color: #222;
+    --muted-text-color: #666;
+    --icon-color: #555;
+    --info-row-background-color: #f4f6f8;
+    --sidebar-color: #ccc;
+    --toggle-bg: #f0f0f0;
+    --toggle-text: #333;
+    --toggle-accent: #0172ad;
+    --toggle-selected-text: #fff;
+    --toggle-border: #d6d6d6;
+    --focus-ring: 0 0 0 3px rgba(1,114,173,.35);
+    --modal-bg: #ffffff;      
+    --modal-text: #222;       
+    --modal-border: #d6d6d6;   
+    --plan-header: #f8f9fa;
+    --plan-header-hover: #e9ecef;
+    --plan-item-header: #e9ecef;
+    --table-head-border: #d6d6d6;
+    --plan-card-border: #ddd;
+
+  }
+
+  [data-theme="dark"] {
+    --card-background-color: #18232c;
+    --info-text-color: #ffffff;
+    --muted-text-color: rgba(255, 255, 255, 0.7);
+    --icon-color: rgba(255, 255, 255, 0.85);
+    --info-row-background-color: #24313d;
+    --sidebar-color: #a0a0a0;
+    --toggle-bg: #1f2328;
+    --toggle-text: #e6edf3;
+    --toggle-accent: #2ea0ff;
+    --toggle-selected-text: #0b1220;
+    --toggle-border: transparent;
+    --focus-ring: 0 0 0 3px rgba(46,160,255,.35);
+    --modal-bg: #1e2a34;       
+    --modal-text: #e6edf3;    
+    --modal-border: #30363d; 
+    --plan-header: #2f3943;
+    --plan-header-hover: #2e3748;
+    --plan-item-header: #484848;
+    --table-head-border: #30363d;
+    --plan-card-border: transparent;
+  }
+
+/* Reusable Multi-Option Toggle Slider */
+.multi-toggle {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  width: 100%;
+  height: 44px;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  border-radius: 22px;
+  overflow: hidden;
+  font-family: sans-serif;
+  font-size: 11px;
+  box-sizing: border-box;
+}
+
+.multi-toggle input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.multi-toggle:focus-within {
+  box-shadow: none;
+}
+
+.multi-toggle label {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  text-align: center;
+  white-space: nowrap;
+  color: var(--toggle-text);
+  font-weight: 500;
+  cursor: pointer;
+  user-select: none;
+  z-index: 1;
+  transition: color 0.2s ease;
+  outline: none;
+  min-width: max-content;
+}
+
+.multi-toggle .slider {
+  position: absolute;
+  top: 2px;
+  height: calc(100% - 4px);
+  background-color: var(--toggle-accent);
+  border-radius: 20px;
+  z-index: 0;
+  transition: all 0.25s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+  pointer-events: none;
+}
+
+/* 2 options */
+.multi-toggle[data-options="2"] { max-width: fit-content; min-width: 200px; }
+.multi-toggle[data-options="2"] .slider { width: calc(50% - 2px); }
+.multi-toggle[data-options="2"] input:nth-of-type(1):checked ~ .slider { left: 2px; }
+.multi-toggle[data-options="2"] input:nth-of-type(2):checked ~ .slider { left: calc(50%); }
+
+/* 3 options */
+.multi-toggle[data-options="3"] { max-width: fit-content; min-width: 300px; }
+.multi-toggle[data-options="3"] .slider { width: calc(33.333% - 1.33px); }
+.multi-toggle[data-options="3"] input:nth-of-type(1):checked ~ .slider { left: 2px; }
+.multi-toggle[data-options="3"] input:nth-of-type(2):checked ~ .slider { left: calc(33.333%); }
+.multi-toggle[data-options="3"] input:nth-of-type(3):checked ~ .slider { left: calc(66.666%); }
+
+/* 4 options */
+.multi-toggle[data-options="4"] { max-width: fit-content; min-width: 400px; }
+.multi-toggle[data-options="4"] .slider { width: calc(25% - 1px); }
+.multi-toggle[data-options="4"] input:nth-of-type(1):checked ~ .slider { left: 2px; }
+.multi-toggle[data-options="4"] input:nth-of-type(2):checked ~ .slider { left: calc(25%); }
+.multi-toggle[data-options="4"] input:nth-of-type(3):checked ~ .slider { left: calc(50%); }
+.multi-toggle[data-options="4"] input:nth-of-type(4):checked ~ .slider { left: calc(75%); }
+
+/* 5 options */
+.multi-toggle[data-options="5"] { max-width: fit-content; min-width: 500px; }
+.multi-toggle[data-options="5"] .slider { width: calc(20% - 0.8px); }
+.multi-toggle[data-options="5"] input:nth-of-type(1):checked ~ .slider { left: 2px; }
+.multi-toggle[data-options="5"] input:nth-of-type(2):checked ~ .slider { left: calc(20%); }
+.multi-toggle[data-options="5"] input:nth-of-type(3):checked ~ .slider { left: calc(40%); }
+.multi-toggle[data-options="5"] input:nth-of-type(4):checked ~ .slider { left: calc(60%); }
+.multi-toggle[data-options="5"] input:nth-of-type(5):checked ~ .slider { left: calc(80%); }
+
+/* Selected label color */
+.multi-toggle input:checked + label {
+  color: var(--toggle-selected-text);
+}
+
+/* Helper wrapper */
+.toggle-wrapper {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.filters-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: .5rem;
+}
+  
+   .entity-card {
+    background: var(--card-background-color);
+    color: var(--info-text-color);
+    padding: 2rem;
+    border-radius: 16px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  
+  
+  .profile-header {
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+  }
+  
+  .avatar-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background-color: var(--info-row-background-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.25rem;
+    color: var(--icon-color);
+  }
+  
+  .profile-meta h2 {
+    margin: 0;
+    font-size: 1.5rem;
+    color: var(--info-text-color);
+  }
+  
+  .profile-meta p {
+    margin: 0.25rem 0 0;
+    font-size: 0.95rem;
+    color: var(--muted-text-color);
+  }
+  
+  .info-columns {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+  }
+  
+  .info-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--info-text-color);
+    margin-bottom: 0.25rem;
+    border-bottom: 1px solid var(--sidebar-color);
+    padding-bottom: 0.25rem;
+    opacity: 0.8;
+  }
+  
+  .info-block {
+    background: var(--info-row-background-color);
+    padding: 0.75rem 1rem;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.95rem;
+  }
+  
+  .info-block .label {
+    font-weight: bold;
+    margin-right: 0.25rem;
+    color: var(--info-label-color, inherit);
+  }
+  
+  .info-block i {
+    opacity: 0.75;
+  }
+  
+  .badge-row {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+  
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: var(--info-row-background-color);
+    color: var(--info-text-color);
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+  
+
+  
+  .address-block {
+    display: flex;
+    align-items: flex-start; 
+    gap: 0.75rem;
+  }
+  
+  .address-block i {
+    margin-top: 0.25rem; 
+    font-size: 1rem;
+  }
+  
+  .address-lines {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .map-link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-decoration: none;
+    color: var(--info-text-color);
+    transition: color 0.2s ease;
+  }
+  
+  .map-link:hover {
+    color: var(--accent-color, #007bff);
+    text-decoration: underline;
+  }
+  
+  .address-line {
+    font-size: 0.95rem;
+    line-height: 1.4;
+    text-transform: none;
+  }
+  
+  .entity-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .entity-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+  
+  .rate-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  
+  .badge.subtle {
+    background-color: var(--info-row-background-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.3rem;
+    font-size: 0.85rem;
+    color: var(--text-color-subtle);
+  }
+  
+  .footnote {
+    font-size: 0.75rem;
+    color: var(--text-color-subtle);
+    margin-top: 0.15rem;
+    margin-left: 1.5rem;
+  }
+  
+  .footnote .label-abbr {
+    font-weight: 500;
+    margin-right: 0.25rem;
+  }
+
+  .avatar.icon-lg svg {
+    height:35px;
+    width:35px;
+  }
+
+  a.badge.entity-link {
+    color: #007bff;
+  }
+
+
+.nav.nav-tabs {
+  display: flex;
+  border-bottom: 1px solid #dee2e6;
+  margin-bottom: 1rem;
+  padding-left: 0;
+  list-style: none;
+}
+
+.nav.nav-tabs .nav-item {
+  margin-bottom: -1px;
+  margin-right: 0.5rem;
+  list-style: none;
+}
+
+.nav.nav-tabs .nav-link {
+  display: block;
+  padding: 0.5rem 1rem;
+  color: #39629f;
+  background-color: transparent;
+  border: 1px solid transparent;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  text-decoration: none;
+  position: relative;
+  cursor: pointer;
+}
+
+.nav.nav-tabs .nav-link:hover {
+  color: #3b70c1;
+  background-color: var(--plan-header);
+  border-color: #e9ecef #e9ecef #dee2e6;
+}
+
+.nav.nav-tabs .nav-link.disabled {
+  color: #6c757d;
+  pointer-events: none;
+  background-color: transparent;
+}
+
+.nav.nav-tabs .nav-link.active {
+  color: var(--info-text-color);
+  background-color: var(--plan-header);
+  border: 1px solid var(--table-head-border);
+  border-bottom: none;
+  font-weight: 500;
+  z-index: 0;
+}
+
+.nav.nav-tabs .nav-link.active::after {
+  content: "";
+  position: absolute;
+  bottom: -1px;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: #fff;
+  pointer-events: none;
+}
+
+.tab-content {
+  border-top: none;
+  padding: 1rem;
+  background-color: #fff;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+}
+
+.tab-pane {
+  display: none;
+}
+.tab-pane.active {
+  display: block;
+}
+
+/* --- Accordion-style Plan Cards --- */
+.plan-card {
+  border: 1px solid var(--plan-card-border);
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  overflow: hidden;
+  transition: box-shadow .2s;
+}
+
+.plan-card:hover {
+  box-shadow: 0 2px 6px rgba(0,0,0,.1);
+}
+
+.plan-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: .75rem 1rem;
+  background: var(--plan-header);
+  cursor: pointer;
+}
+.plan-header:hover {
+  background: var(--plan-header-hover);
+  
+}
+.plan-header.active {
+  background: var(--plan-header-hover);
+  border-bottom: 1px solid #ddd;
+}
+
+.plan-header .toggle-icon {
+  transition: transform .3s ease;
+}
+.plan-header.active .toggle-icon {
+  transform: rotate(180deg);
+}
+
+.plan-content {
+  padding: 0 1rem;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height .3s ease;
+  background: #fafafa;
+  background: var(--table-head-bg);
+}
+
+.items-table thead th {
+  background-color: var(--table-head-bg);
+  border-bottom: 1px solid var(--table-head-border);
+
+}
+
+.plan-card.open .plan-content {
+  padding: 1rem;           
+  max-height: none !important;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1rem;
+}
+.items-table th,
+.items-table td {
+  padding: .5rem;
+  border-bottom: 1px solid #ddd;
+}
+.items-table th {
+  background: #e1e1e1;
+  font-weight: 600;
+  text-align: left;
+}
+
+.date-range-picker {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.date-field {
+  flex: 1;
+}
+
+.date-input {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.btn-edit { 
+  background: #0172ad; 
+  color: #fff; 
+}
+
+.btn-delete { 
+  background: #ce1a2c; 
+  color: #fff; 
+  border:none; 
+}
+
+.plan-actions { 
+  display: flex; 
+  justify-content: flex-end; 
+  gap: 0.5rem; 
+  margin-top: 1rem; 
+}
+
+.modal-content {
+  background-color: var(--modal-bg) !important;
+  color: var(--modal-text);
+  border: 1px solid var(--modal-border);
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.25);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 9999;
+  background: rgba(0,0,0,.55);
+}
+
+.modal-backdrop.is-open {
+  display: flex;
+}
+
+.modal-shell {
+  width: min(1000px, 96vw);
+  max-height: 90vh;
+  overflow: auto;
+}
+
+.modal-shell pre {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  margin: 0;
+}
+
+.plan-actions.plan-actions--split {
+  display: grid;                
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;      
+  width: 100%;
+}
+
+.plan-actions.plan-actions--split .btn {
+  width: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;       
+  text-align: center;
+  padding: .4rem .7rem;     
+  font-size: .85rem;        
+  border-radius: 8px;
+  gap: .35rem;            
+}
+
+.plan-actions.plan-actions--split .btn-delete {
+  background: #c84646;    
+  color: #fff;
+  border: none;
+}
+.plan-actions.plan-actions--split .btn-delete:hover { background: #b83c3c; }
+.plan-actions.plan-actions--split .btn-delete:active,
+.plan-actions.plan-actions--split .btn-delete:focus  { background: #a73535; }
+
+.plan-actions.plan-actions--split .btn svg {
+  width: 16px;
+  height: 16px;
+
+  
+}
+
+@media (max-width: 480px) {
+  .plan-actions.plan-actions--split {
+    grid-template-columns: 1fr;
+  }
+
+  .plan-pill-row {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  /* Only badges inside this row get normalized */
+  .plan-pill-row .plan-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    margin: 0;
+  }
+  
+  /* Icons inside these pills only */
+  .plan-pill-row .plan-badge i {
+    display: inline-block;
+    font-size: 0.9rem;
+    line-height: 1;
+    margin-right: 0.35rem;
+  }
+  
+}
+/* -------------------------
+   Comment Pill + Tooltip
+   ------------------------- */
+
+   .comment-pill {
+    display: inline-block;
+    vertical-align: 0.05em !important;
+    background: var(--toggle-accent);
+    color: #fff;
+    padding: 2px 6px;
+    font-size: 10px;
+    border-radius: 999px;
+    margin-left: 6px;
+    line-height: 1;
+    cursor: pointer;
+    position: relative;
+    overflow: visible;
+  }
+  
+  /* Tooltip bubble (no arrow) */
+  .comment-pill::after {
+    content: attr(data-comment-tooltip);
+    position: absolute;
+    background: #000;
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    font-size: 12px;
+  
+    top: -38px;
+    left: 50%;
+    transform: translateX(-50%);
+  
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.03s ease-out;
+  }
+  
+  .comment-pill::before {
+    content: none;
+  }
+  
+  .comment-pill:hover::after {
+    opacity: 1;
+  }
+  
+  .notes-inline {
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .notes-inline-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+  }
+  
+  .notes-list-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .notes-empty {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--muted-text-color);
+    font-style: italic;
+  }
+  
+  .notes-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem;
+    max-height: 220px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+  }
+  
+  .note-item {
+    background: var(--info-row-background-color);
+    border-radius: 10px;
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .note-item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.25rem;
+    font-size: 0.8rem;
+    color: var(--muted-text-color);
+    white-space: nowrap;
+  }
+  
+  .note-author {
+    font-weight: 600;
+    flex-shrink: 0;
+  }
+  
+  .note-meta {
+    display: inline-block;      
+    white-space: nowrap;
+  }
+  
+  .note-meta-time {
+    display: inline-block;
+    font-size: 0.75rem;
+    color: var(--muted-text-color);
+    vertical-align: middle;   
+  }
+  
+  .note-body {
+    font-size: 0.9rem;
+    white-space: normal;
+    color: var(--info-text-color);
+  }
+
+  .notes-composer {
+    margin-top: 0.35rem;
+  }
+  
+  .notes-composer--inline {
+    border-top: 1px solid var(--sidebar-color);
+    padding-top: 0.6rem;
+  }
+  
+  .notes-composer--inline form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+  
+  .notes-textarea {
+    width: 100%;
+    resize: vertical;
+    box-sizing: border-box;
+  }
+  
+  .notes-textarea--inline {
+    min-height: 60px;
+    max-height: 140px;
+    font-size: 0.85rem;
+    background: var(--card-background-color);
+    border-radius: 6px;
+  }
+  
+  .notes-form-actions {
+    display: flex;
+    justify-content: flex-end;
+  }
+  
+  .notes-submit-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.25rem 0.8rem;
+    font-size: 0.8rem;
+    width: auto !important;
+    flex: 0 0 auto !important;
+  }
+  
+  .notes-delete-form {
+    display: inline-block;
+    margin: 0;
+    padding: 0;
+    vertical-align: middle;    
+  }
+  
+  .notes-delete-btn {
+    all: unset;            
+    cursor: pointer;
+    display: inline-block;
+    vertical-align: middle;   
+    color: var(--muted-text-color);
+  }
+  
+  .notes-delete-btn i,
+  .notes-delete-btn svg {
+    font-size: 14px;
+    width: 14px;
+    height: 14px;
+
+  }
+
+  .notes-delete-btn:hover {
+    color: #c84646;
+  }
+    
+  /* Align count pill next to names in grids */
+  .comment-pill {
+    vertical-align: middle !important;
+  }
+  
+  /* Edit form layout */
+.profile-meta--edit {
+  flex: 1;
+}
+
+.profile-meta--edit .grid {
+  margin-bottom: 0;
+}
+
+.info-section .info-block {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.25rem 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.info-section .info-block .badge-row {
+  flex-basis: 100%;
+  margin-top: 0.25rem;
+}
+
+.info-section .info-block .info-label {
+  flex-basis: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.25rem;
+}
+
+.info-section .info-block .info-label i,
+.info-section .info-block .info-label svg {
+  opacity: 0.75;
+}
+
+.info-section .info-block .info-label label {
+  font-weight: 600;
+  margin: 0;
+}
+
+/* Inputs full width */
+.info-section .info-block input:not([type="checkbox"]),
+.info-section .info-block select,
+.info-section .info-block textarea,
+.info-section .info-block .choices {
+  width: 100%;
+  align-self: stretch;
+}
+
+a[role="button"] {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+}
+
+.status-pill{
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.status-pill--completed{
+  background: rgba(34,197,94,.15);
+  color: rgb(22,101,52);
+  border: 1px solid rgba(34,197,94,.35);
+}
+
+.status-pill--failed{
+  background: rgba(239,68,68,.15);
+  color: rgb(153,27,27);
+  border: 1px solid rgba(239,68,68,.35);
+}
+
+.status-pill--partial{
+  background: rgba(245,158,11,.15);
+  color: rgb(146,64,14);
+  border: 1px solid rgba(245,158,11,.35);
+}
+
+/* ── User avatar ────────────────────────────────────────────────────────────
+   Ported from ORMed v2's custom.css. Emitted by the avatar() Twig macro, used
+   by the sidebar footer. ORMed also has an <img> variant for Google OAuth
+   pictures; HealthEd uses form login with no avatarUrl, so only the initials
+   path is reachable — the img rule is kept so the two files stay comparable. */
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  line-height: 1;
+  user-select: none;
+  vertical-align: middle;
+}
+.user-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+.user-avatar--initials {
+  background: #e5e7eb;
+  color: #4b5563;
+  border: 1px solid #9ca3af;
+  font-weight: 600;
+}
+/* sm sized to match .icon-btn (32px) so side-by-side circles line up. */
+.user-avatar--sm { width: 32px; height: 32px; font-size: 12px; }
+.user-avatar--md { width: 40px; height: 40px; font-size: 14px; }
+.user-avatar--lg { width: 64px; height: 64px; font-size: 24px; }
+[data-theme="dark"] .user-avatar--initials {
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+/* ── Section tab bar ────────────────────────────────────────────────────────
+   From ORMed v2. Groups several grids under one sidebar entry — v1 does this
+   for Districts (Agencies / Buildings / Clusters). Rendered by
+   templates/_tab_bar.html.twig. */
+nav.page-tabs {
+  display: flex;
+  justify-content: stretch;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  height: 44px;
+  margin: 0.75rem 0 1rem 0;
+  padding: 2px;
+  background: var(--toggle-bg);
+  border: 1px solid var(--toggle-border);
+  border-radius: 22px;
+  font-family: sans-serif;
+  font-size: 13px;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+nav.page-tabs a.page-tab {
+  flex: 1 1 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 18px;
+  height: 100%;
+  color: var(--toggle-text);
+  text-decoration: none;
+  font-weight: 500;
+  white-space: nowrap;
+  border-radius: 20px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+nav.page-tabs a.page-tab:hover {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--toggle-text);
+  text-decoration: none;
+}
+[data-theme="dark"] nav.page-tabs a.page-tab:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+nav.page-tabs a.page-tab--active,
+nav.page-tabs a.page-tab--active:hover {
+  background-color: var(--toggle-accent);
+  color: var(--toggle-selected-text);
+  text-decoration: none;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+}
+
+/* Explanatory line under a grid header — v1 uses one on People (Historical) to
+   distinguish it from Users. Muted and small so it reads as a caption. */
+.grid-subtitle {
+  margin: -0.25rem 0 0.75rem 0;
+  font-size: 0.85rem;
+  color: var(--pico-muted-color, #6b7280);
+}
+
+/* ── User profile / My Profile ───────────────────────────────────────────────
+   Two-column field layout plus the security-level callout, matching v1's
+   UserPages/View. */
+.profile-columns {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 0 2.5rem;
+}
+.profile-columns .info-block {
+  margin-bottom: 0.9rem;
+}
+.profile-columns .label {
+  display: block;
+  font-weight: 700;
+  margin-bottom: 0.1rem;
+}
+
+/* v1 renders this as a light-blue panel, centred under the two columns. */
+.security-callout {
+  max-width: 46rem;
+  margin: 1.25rem auto 0.25rem auto;
+  padding: 1rem 1.25rem;
+  background: color-mix(in srgb, var(--pico-primary, #0172ad) 8%, transparent);
+  border-radius: 0.35rem;
+}
+.security-callout p {
+  margin: 0.4rem 0 0 0;
+}
+.security-callout__list .label {
+  font-weight: 700;
+  margin-right: 0.35rem;
+}
+[data-theme="dark"] .security-callout {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Empty state inside a card — v1 draws a bordered panel rather than bare text. */
+.empty-panel {
+  margin: 0.5rem auto;
+  padding: 1.1rem;
+  max-width: 32rem;
+  text-align: center;
+  border: 1px solid var(--pico-primary, #0172ad);
+  border-radius: 0.3rem;
+  background: color-mix(in srgb, var(--pico-primary, #0172ad) 5%, transparent);
+}
+
+/* Action bar pinned below the cards, as in v1. */
+.profile-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 1rem 0 2rem 0;
+}
+.profile-actions a[role="button"],
+.profile-actions button {
+  margin: 0;
+  width: auto;
+}
+/* The password-reset button is a POST, so it sits in its own form; keep that form from
+   breaking the row of buttons onto its own line. */
+.profile-actions .inline-form {
+  display: contents;
+}
+
+/* ── Round grid action buttons ───────────────────────────────────────────────
+   Ported from ORMed v2. White fill / secondary border / secondary icon,
+   inverting on hover. Colours come from Pico's secondary palette so they read
+   as native. Emitted by macros.iconBtn(icon, label, href).
+
+   Tooltips are Pico v2's native [data-tooltip] — deliberately NO custom
+   tooltip CSS here. ORMed had a custom ::after that double-stacked with
+   Pico's ::before and had to be removed. */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  background: var(--card-background-color);
+  border: 1px solid var(--pico-secondary-background);
+  border-radius: 50%;
+  color: var(--pico-secondary-background);
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  position: relative;
+  flex-shrink: 0;
+}
+.icon-btn:hover,
+.icon-btn:focus-visible {
+  background: var(--pico-secondary-hover-background);
+  border-color: var(--pico-secondary-hover-background);
+  color: var(--card-background-color);
+  text-decoration: none;
+  outline: none;
+}
+/* Danger variant — destructive actions (Remove / Delete). Unused so far; kept
+   so red means one thing whenever a delete action does land. */
+.icon-btn.icon-btn--danger {
+  border-color: var(--pico-del-color, #c62828);
+  color: var(--pico-del-color, #c62828);
+}
+.icon-btn.icon-btn--danger:hover,
+.icon-btn.icon-btn--danger:focus-visible {
+  background: var(--pico-del-color, #c62828);
+  color: var(--card-background-color);
+}
+/* Success variant — affirmative actions (Approve). Pairs with --danger so
+   approve/decline read as opposites rather than two neutral buttons. Wanted by
+   the imported-events approval queue when that lands. */
+.icon-btn.icon-btn--success {
+  border-color: var(--pico-ins-color, #2e7d32);
+  color: var(--pico-ins-color, #2e7d32);
+}
+.icon-btn.icon-btn--success:hover,
+.icon-btn.icon-btn--success:focus-visible {
+  background: var(--pico-ins-color, #2e7d32);
+  color: var(--card-background-color);
+}
+/* Reset browser/Pico overrides when icon-btn is applied to a <button>. */
+button.icon-btn {
+  margin: 0;
+  cursor: pointer;
+  font-size: inherit;
+  line-height: 1;
+}
+/* SVG icons inherit colour via currentColor; size them to fit the circle. */
+.icon-btn svg {
+  width: 14px;
+  height: 14px;
+}
+/* Row of icon buttons in a grid actions cell. */
+.icon-btn-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* ── Events: card view, filter panel, detail hero ────────────────────────────
+   Recovered from ~/projects/claude-testing/healthed-trainings — the original
+   conversion copy, which was worked on for ~9 hours after this project was
+   branched off it and so carries the finished Events screens. Paired with
+   templates/events/{search,search_results,view}.html.twig and the three
+   _*_row.html.twig partials. */
+/* Filter panel box */
+.events-filter-panel {
+  border: 1px solid var(--sidebar-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--card-background-color);
+}
+/* Card grid */
+.event-search-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  padding-bottom: .5rem;
+}
+.event-card-name {
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1.3;
+}
+/* Event Templates cards: the training type under the name, as v1's deck had it. */
+.event-card-subtitle {
+  font-size: .85rem;
+  font-weight: 600;
+  color: var(--pico-primary);
+}
+.event-card-meta {
+  color: var(--muted-text-color);
+  font-size: .85rem;
+  line-height: 1.5;
+}
+.event-card-spots {
+  font-size: .85rem;
+}
+/* Shared badge base */
+.event-card-badge {
+  border-radius: 4px;
+  padding: .2rem .5rem;
+  font-size: .8rem;
+  font-weight: 600;
+  text-align: center;
+  display: block;
+}
+.event-card-badge--restriction {
+  background: var(--event-restriction-bg);
+  border: 1px solid var(--event-restriction-border);
+  color: var(--event-restriction-text);
+}
+.event-card-badge--reservation {
+  background: var(--event-reservation-bg);
+  border: 1px solid var(--event-reservation-border);
+  color: var(--event-reservation-text);
+}
+.event-card-badge--cancelled {
+  background: var(--event-cancelled-bg);
+  border: 1px solid var(--event-cancelled-border);
+  color: var(--event-cancelled-text);
+}
+.event-card-description {
+  color: var(--muted-text-color);
+  font-size: .8rem;
+  line-height: 1.4;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.event-card-actions {
+  margin-top: auto;
+  padding-top: .5rem;
+  border-top: 1px solid var(--toggle-border);
+  display: flex;
+  gap: .5rem;
+}
+.event-card-actions a[role="button"] {
+  flex: 1;
+  font-size: .82rem;
+  padding: .3rem .4rem;
+}
+/* Event Templates: the first action gets a row to itself. */
+.event-card-actions--stacked {
+  flex-wrap: wrap;
+}
+.event-card-actions--stacked a[role="button"]:first-child {
+  flex-basis: 100%;
+}
+/* Alert row tint for list view */
+tr.event-row-alert td {
+  background-color: var(--event-alert-bg);
+}
+/* ── Event Hero Banner ─────────────────────────────────────────────── */
+.event-hero {
+  background: linear-gradient(135deg, #1a2a3a 0%, #0d1b2a 100%);
+  color: #fff;
+  padding: 1.75rem 2rem;
+  margin-bottom: 1.5rem;
+  border-radius: var(--pico-border-radius);
+}
+.event-hero-title {
+  color: #fff;
+  margin: 0 0 .5rem;
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+.event-hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  border-radius: 999px;
+  padding: .2rem .75rem;
+  font-size: .85rem;
+}
+.event-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.25rem;
+  margin-top: .6rem;
+  font-size: .9rem;
+  color: rgba(255,255,255,.85);
+}
+.event-hero-meta svg {
+  fill: rgba(255,255,255,.85);
+  vertical-align: middle;
+}
+
+/* ── Event search: card container + colour tokens ────────────────────────────
+   The rest of the events CSS came across earlier; these did not, because the
+   container class is `.event-search-card` and the extraction was matching on
+   `event-card` — which is not a substring of it. The name/meta/badge rules did
+   land, so the cards rendered with text but no border, background or padding.
+
+   These tokens drive the restriction / reservation / cancelled badges and the
+   full-event tint, in both themes. */
+:root {
+  --event-alert-bg:            rgba(220, 53, 69, 0.08);
+  --event-alert-border:        rgba(220, 53, 69, 0.28);
+  --event-restriction-bg:      rgba(255, 193, 7, 0.15);
+  --event-restriction-border:  rgba(255, 193, 7, 0.45);
+  --event-restriction-text:    #6d4c00;
+  --event-reservation-bg:      rgba(13, 110, 253, 0.08);
+  --event-reservation-border:  rgba(13, 110, 253, 0.25);
+  --event-reservation-text:    #084298;
+  --event-cancelled-bg:        rgba(220, 53, 69, 0.15);
+  --event-cancelled-border:    rgba(220, 53, 69, 0.35);
+  --event-cancelled-text:      #842029;
+}
+[data-theme="dark"] {
+  --event-alert-bg:            rgba(220, 53, 69, 0.13);
+  --event-alert-border:        rgba(220, 53, 69, 0.35);
+  --event-restriction-bg:      rgba(255, 193, 7, 0.12);
+  --event-restriction-border:  rgba(255, 193, 7, 0.35);
+  --event-restriction-text:    #ffc107;
+  --event-reservation-bg:      rgba(100, 160, 255, 0.10);
+  --event-reservation-border:  rgba(100, 160, 255, 0.28);
+  --event-reservation-text:    #6ea8fe;
+  --event-cancelled-bg:        rgba(220, 53, 69, 0.18);
+  --event-cancelled-border:    rgba(220, 53, 69, 0.40);
+  --event-cancelled-text:      #f08080;
+}
+.event-search-card {
+  background: var(--card-background-color);
+  border: 1px solid var(--toggle-border);
+  border-radius: 8px;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .45rem;
+  font-size: .9rem;
+}
+.event-search-card.is-alert {
+  background-color: var(--event-alert-bg);
+  border-color: var(--event-alert-border);
+}
+
+/* ── Card / List view toggle ─────────────────────────────────────────────────
+   Segmented control, taken from ORMed v2's /caseloads toggle so the two apps
+   share one idiom. ORMed switches view client-side by toggling a class on the
+   results container; here the views render different markup, so the control
+   drives a hidden input that HTMX posts. Same look, different plumbing. */
+.view-toggle-group {
+    display: inline-flex;
+    gap: 2px;
+    align-items: center;
+    background: var(--pico-muted-border-color, #d1d5db);
+    border-radius: 6px;
+    padding: 2px;
+}
+.view-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    color: var(--pico-muted-color, #6b7280);
+    cursor: pointer;
+    padding: 0;
+    margin: 0;
+    transition: background 0.15s, color 0.15s;
+}
+.view-toggle-btn:hover {
+    background: var(--pico-muted-background, #f3f4f6);
+    color: var(--pico-primary, #0172ad);
+}
+.view-toggle-btn--active {
+    background: var(--card-background-color, #fff);
+    color: var(--pico-primary, #0172ad);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12);
+}
+
+/* ── Flash messages ───────────────────────────────────────────────────────────
+   Paired with templates/_flashes.html.twig. ORMed v2 carries these keyframes in
+   an inline <style> inside the partial; here they live in the stylesheet so the
+   rule is not re-emitted on every page render. The per-flash colours stay inline
+   in the partial, since they are driven by the flash type. */
+@keyframes flash-in {
+    0%   { transform: translateY(-8px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+}
+
+.flash {
+    animation: flash-in 0.3s ease-out;
+}
+
+/* ── Let wide content scroll instead of stretching the page ───────────────────
+   `body` is a flex row (sidebar + #main-wrapper, see theme.css). Flex items default
+   to `min-width: auto`, which resolves to their max-content width — so a table wider
+   than the viewport forced #main-wrapper wider than the screen and dragged the whole
+   page with it, filters and header included, pushing controls out of reach.
+
+   `main` already carries `min-inline-size: 0%` in theme.css, so this was half-fixed;
+   the wrapper above it was missed. With min-width: 0 the wrapper stays at viewport
+   width and the overflow lands where it belongs — inside .report-scroll.
+
+   Kept here rather than in theme.css so the shared theme file stays in step with the
+   other apps on this layout, but it is a general fix: any wide grid benefits. */
+#main-wrapper {
+    min-width: 0;
+}
+
+/* ── Building Report (native replacement for the Jasper one) ──────────────────
+   The screen view is deliberately allowed to be wider than a page: it scrolls
+   inside .report-scroll, which is what lets it show every training type with real
+   dates. The PDF template does the compact MM/YY treatment instead. */
+
+.report-filters {
+    display: flex;
+    flex-direction: column;
+    gap: .5rem;
+    margin-bottom: 1rem;
+    /* Independent of the matrix's width: the controls stay on screen no matter how
+       many training-type columns are showing. */
+    max-width: 100%;
+    min-width: 0;
+
+    /* Lift the whole filter block — and therefore the Choices dropdown inside it —
+       above the matrix. Choices' dropdown and the sticky Employee column are both
+       z-index: 1, so DOM order decided it and the table (which comes later) painted
+       over the open dropdown.
+       Sits inside the app's existing budget: breadcrumbs 2, this 5, top nav 10,
+       sidebar 20. */
+    position: relative;
+    z-index: 5;
+}
+
+.report-filters__row {
+    display: flex;
+    align-items: flex-end;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.report-filters__row label { flex: 0 1 16rem; min-width: 0; margin-bottom: 0; }
+
+/* Pushed to the right edge and sized to its content, so it reads as a sibling of
+   the CSV and PDF buttons in the header rather than a full-width form submit. */
+.report-filters__row button {
+    flex: 0 0 auto;
+    width: auto;
+    margin-bottom: 0;
+    margin-left: auto;
+    padding: .5rem 1.25rem;
+}
+
+.report-summary {
+    max-width: 100%;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem .5rem;
+    margin-bottom: 1rem;
+    font-size: .85rem;
+}
+
+.report-summary span {
+    padding: .25rem .6rem;
+    border-radius: 4px;
+    background: var(--pico-card-sectioning-background-color);
+}
+
+.report-notice {
+    padding: .6rem .8rem;
+    border-left: 4px solid #f59e0b;
+    background: #f59e0b21;
+    border-radius: 0 4px 4px 0;
+}
+
+.report-building { margin-bottom: 1.5rem; }
+
+.report-building h4 { margin-bottom: .35rem; }
+.report-building h4 small {
+    font-weight: normal;
+    color: var(--pico-muted-color);
+    margin-left: .5rem;
+}
+
+/* The horizontal scroller. Only this scrolls — the page itself must not, which is
+   why overflow-x lives here and not on an ancestor. */
+.report-scroll {
+    overflow-x: auto;
+    max-width: 100%;
+}
+
+.report-matrix { margin-bottom: 0; font-size: .85rem; }
+.report-matrix th,
+.report-matrix td {
+    text-align: center;
+    white-space: nowrap;
+    padding: .3rem .5rem;
+}
+.report-matrix__name {
+    text-align: left !important;
+    position: sticky;
+    left: 0;
+    background: var(--pico-background-color);
+    z-index: 1;
+}
+
+/* Status tints. Kept light enough to read through in both themes, and paired with
+   a left border so the distinction survives a monochrome screenshot. */
+.cell--expired { background: #dc26261f; border-left: 3px solid #dc2626; }
+.cell--soon    { background: #f59e0b1f; border-left: 3px solid #f59e0b; }
+.cell--current { background: #22c55e14; }
+.cell--none    { color: var(--pico-muted-color); }
+
+.report-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    font-size: .8rem;
+    margin-top: .5rem;
+}
+.report-legend span { padding: .2rem .5rem; border-radius: 3px; }
+
+/* Choices.js builds a multi-select as chips plus a hidden type-to-search
+   <input type="text"> (.choices__input--cloned) inside .choices__inner. Pico styles
+   every text input as a full-width block with a 1rem bottom margin, so that search
+   field turned into a tall empty box under the chips — the control rendered about
+   three times the height it needed.
+
+   Scoped to .report-filters rather than fixed globally: the same thing will affect
+   any Choices multi-select in the app, but changing it app-wide is a bigger visual
+   change than this task warrants. */
+.report-filters .choices,
+.report-filters .choices__inner {
+    min-height: 0;
+    height: auto;
+}
+
+.report-filters .choices { margin-bottom: 0; }
+.report-filters .choices__inner { padding: .3rem .4rem; }
+
+.report-filters .choices__input--cloned {
+    display: inline-block;
+    width: auto;
+    min-width: 10rem;
+    height: auto;
+    margin: 0;
+    padding: .15rem .25rem;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    font-size: .9rem;
+}
+
+/* Chips sit inline with the search field rather than stacking. */
+.report-filters .choices__list--multiple { display: inline; }
+.report-filters .choices__list--multiple .choices__item { margin-bottom: .2rem; }
+
+/* Staleness toggle: reads as one line of prose with a switch, not a form field. */
+.report-stale {
+    display: flex;
+    align-items: baseline;
+    gap: .5rem;
+    margin: 0;
+    font-size: .9rem;
+}
+
+.report-stale input[role="switch"] { flex: 0 0 auto; margin: 0; }
+
+/* The label text was a bare text node, so flex shrank it and it wrapped to two
+   lines — spending exactly the vertical space this row is meant to save. */
+.report-stale > span { flex: 0 0 auto; }
+.report-stale small { flex: 1 1 auto; color: var(--pico-muted-color); }
+
+.report-notice--info {
+    border-left-color: #3b82f6;
+    background: #3b82f61f;
+}
+
+/* Districts and Buildings share a row. min-width: 0 on the labels is what lets them
+   actually shrink — a flex item defaults to min-width: auto, and the 434-option
+   building select has a wide intrinsic size, so without it the pair would push the
+   row wider than the page instead of splitting it. */
+.report-filters__selects {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.report-filters__selects > label {
+    flex: 1 1 18rem;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+/* Training Status Report — a flat log, so unlike the Building Report's matrix the
+   cells hold prose and need to wrap rather than stay on one line. */
+.report-log { margin-bottom: 0; font-size: .85rem; }
+.report-log th, .report-log td { padding: .35rem .5rem; vertical-align: top; }
+.report-log__email { word-break: break-all; }
+.report-log small { color: var(--pico-muted-color); }
+
+/* Run sits at the end of the filter block, right-aligned — the same place the
+   Building Report puts it, where it reads as "apply everything above". */
+.report-filters__actions {
+    display: flex;
+    justify-content: flex-end;
+    /* Pulled down against the summary strip that follows, so the button reads as
+       sitting alongside the counts rather than stranded on a row of its own. The
+       submit has to stay inside the <form>, so it cannot literally share that row. */
+    margin-bottom: -0.5rem;
+}
+
+.report-filters__actions button {
+    width: auto;
+    margin-bottom: 0;
+    padding: .5rem 1.25rem;
+}
+
+/* Two date inputs should not stretch to fill the row now that the button has left
+   it; they need about the same width as one of the selects below. */
+.report-filters__row--dates label { flex: 0 1 12rem; }
+
+/* First Aid Cards Report — the per-building ODE summary band. Reads as a strip of
+   figures above the staff list that justifies them. */
+.report-cluster { margin: 1.5rem 0 .5rem; }
+.report-cluster small { font-weight: normal; color: var(--pico-muted-color); }
+
+.fac-summary {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem .5rem;
+    margin: .35rem 0 .6rem;
+    font-size: .85rem;
+}
+
+.fac-summary span {
+    padding: .25rem .6rem;
+    border-radius: 4px;
+    background: var(--pico-card-sectioning-background-color);
+}
+
+.report-building h5 { margin-bottom: .2rem; }
+.report-building h5 small { font-weight: normal; color: var(--pico-muted-color); margin-left: .5rem; }
+
+/* ── Web training player ──────────────────────────────────────────────────────
+   The stage is where public/js/training-viewer.js draws slides. It is sized to a
+   comfortable reading width rather than the full page, because training slides are
+   documents, not dashboards. */
+.tv-stage {
+    min-height: 24rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--pico-card-sectioning-background-color);
+    border-radius: var(--pico-border-radius);
+    padding: 1rem;
+    overflow: auto;
+}
+
+/* The whole card shrinks to the document, not just the stage inside it.
+   Shrinking only the stage achieved nothing visible: its background is near-white in
+   light mode, so against a full-width white card the page still looked adrift in
+   space. Sizing the article means the title, the slide counter and the Back/Next
+   buttons all line up with the edges of the slide. */
+.tv--fitted {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+}
+
+/* When the stage holds a document, image or video, the frame hugs it instead of
+   spanning the page. On a wide screen a slide fitted to height left most of the card
+   empty, which read as the viewer being broken rather than the page being portrait.
+   Applied by the player, since only it knows what it just drew — a question slide is
+   prose and still wants the full width. */
+.tv-stage--fitted {
+    width: fit-content;
+    max-width: 100%;
+    margin-inline: auto;
+    min-height: 0;
+}
+
+.tv-loading, .tv-error { color: var(--pico-muted-color); }
+.tv-error { color: var(--pico-del-color, #dc2626); font-weight: 600; }
+
+.tv-media { max-width: 100%; max-height: 70vh; }
+
+/* PDF page: the canvas paints the page, the text layer sits invisibly over it so the
+   text is selectable and reachable by a screen reader. Position relative anchors the
+   absolutely-positioned text layer PDF.js builds. */
+.tv-pdf { position: relative; line-height: 1; }
+
+/* max-width is a safety net only — the player sizes the canvas to fit the stage in
+   both dimensions, so it should never trigger. If it ever does, the canvas shrinks
+   while the text layer (absolutely positioned from PDF.js coordinates) does not, and
+   the two drift apart. Fix the fit calculation rather than leaning on this. */
+.tv-pdf canvas { max-width: 100%; height: auto; display: block; }
+
+.tv-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+.tv-nav button { width: auto; margin-bottom: 0; }
+
+.tv-status { min-height: 1.5rem; margin: .5rem 0 0; color: var(--pico-muted-color); }
+
+.tv-question__prompt { font-weight: 600; font-size: 1.05rem; }
+.tv-question fieldset { border: 0; padding: 0; margin: 0 0 .75rem; }
+.tv-question label { display: block; margin-bottom: .4rem; cursor: pointer; }
+.tv-question button { width: auto; }
+.tv-question__feedback { min-height: 1.5rem; margin: .25rem 0 .75rem; }
+.tv-question__feedback.is-correct { color: #22c55e; font-weight: 600; }
+.tv-question__feedback.is-wrong   { color: #dc2626; font-weight: 600; }
+
+.tv-done { text-align: center; }
+.tv-finish { display: flex; gap: 1rem; margin-top: 1rem; }
+
+.tv-badge {
+    display: inline-block;
+    padding: .25rem .6rem;
+    border-radius: 4px;
+    font-size: .85rem;
+    background: var(--pico-card-sectioning-background-color);
+    margin-right: .5rem;
+}
+.tv-badge--training_complete { background: #22c55e21; }
+.tv-badge--training_complete_expires_soon { background: #f59e0b21; }
+.tv-badge--training_inprogress { background: #3b82f621; }
+.tv-badge--unavailable { background: #dc262621; }
+.tv-badge small { color: var(--pico-muted-color); margin-left: .25rem; }
+
+/* ── Self-reported training ("Add Event History" / "Approve Events") ─────── */
+.status-pill {
+  display: inline-block;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.status-pill--pending  { background: #fef3c7; color: #92400e; }
+.status-pill--approved { background: #dcfce7; color: #166534; }
+.status-pill--rejected { background: #fee2e2; color: #991b1b; }
+
+.notice {
+  padding: 0.75rem 1rem;
+  border-radius: var(--pico-border-radius);
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+}
+.notice--success { background: #dcfce7; color: #166534; }
+.notice--error   { background: #fee2e2; color: #991b1b; }
+
+.evidence-list { list-style: none; padding: 0; margin: 0 0 1rem; }
+.evidence-list li { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.35rem; }
+.evidence-list__remove { width: auto; margin: 0; padding: 0.15rem 0.6rem; font-size: 0.8rem; }
+
+.decision-form__buttons { display: flex; gap: 0.75rem; }
+.decision-form__buttons button { width: auto; margin: 0; }
+
+/* The count on "Approve Events", as v1 showed.
+   Qualified this heavily on purpose: the sidebar's `aside.open nav ul li a span` rule
+   (theme.css) also matches this span — it gives every label 8px of left padding and a
+   15px font — and a bare `.nav-badge` loses to it, which left the count jammed against
+   the label. The link is not a flex row, so spacing is a margin, not `margin-left: auto`.
+   When the sidebar is collapsed the badge hides with the labels. */
+aside.open nav ul li a span.nav-badge {
+  display: inline-block;
+  margin-left: 0.6rem;
+  min-width: 1.5rem;
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse);
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: center;
+  vertical-align: 0.1em;
+}
+
+/* ── Help page ─────────────────────────────────────────────────────────── */
+.help-contact dt {
+  font-weight: 700;
+  margin-top: .75rem;
+}
+.help-contact dd {
+  margin-left: 0;
+}
+
+/* ── Web training page: what a participant reads ───────────────────────── */
+.web-training-requirements {
+  color: var(--muted-text-color);
+  margin-bottom: 1rem;
+}
+.web-training-description {
+  max-width: 70ch;
+}
+.web-training-unmet {
+  display: block;
+  max-width: 34rem;
+  margin: 0;
+  color: var(--event-restriction-text);
+}
+
+/* ── Profile: email addresses ──────────────────────────────────────────── */
+.email-help { color: var(--muted-text-color); font-size: .9rem; }
+.email-addresses td { vertical-align: middle; }
+.email-actions { text-align: right; white-space: nowrap; }
+.email-actions .inline-form { display: inline-block; margin: 0 0 0 .4rem; }
+.email-actions button { margin: 0; padding: .25rem .6rem; font-size: .85rem; }
+.email-add { max-width: 34rem; margin-top: 1rem; }
+.status-pill--confirmed { background: #e0f2fe; color: #075985; }
+.email-add button { display: inline-flex; align-items: center; gap: .35rem; white-space: nowrap; }
+
+/* ── Google sign-in pages ──────────────────────────────────────────────── */
+.auth-narrow { max-width: 34rem; margin: 0 auto; }
+.google-address { font-size: 1.15rem; font-weight: 700; word-break: break-all; }
+.auth-choices { display: flex; flex-wrap: wrap; gap: .6rem; margin-bottom: 1rem; }
+.auth-choices > * { margin: 0; }
+.auth-aside { font-size: .9rem; color: var(--muted-text-color); }
+.google-signin { display: flex; justify-content: center; align-items: center; gap: .5rem; width: 100%; margin-bottom: .5rem; }
+
+/* ── Merging accounts (users/_merge_summary.html.twig) ─────────────────── */
+.merge-accounts { display: flex; align-items: stretch; gap: .75rem; margin-bottom: 1.25rem; flex-wrap: wrap; }
+.merge-account {
+  flex: 1 1 14rem; display: flex; flex-direction: column; gap: .15rem;
+  padding: .75rem 1rem; border-radius: var(--pico-border-radius);
+  border: 1px solid var(--pico-muted-border-color); word-break: break-word;
+}
+.merge-account small { color: var(--muted-text-color); text-transform: uppercase; letter-spacing: .03em; font-size: .72rem; }
+.merge-account--from { opacity: .85; border-style: dashed; }
+.merge-account--into { border-color: var(--pico-primary); }
+.merge-arrow { align-self: center; font-size: 1.5rem; color: var(--muted-text-color); }
+.merge-warning {
+  border-left: 4px solid #dc2626; background: #fef2f2; color: #7f1d1d;
+  padding: .75rem 1rem; border-radius: var(--pico-border-radius); margin-bottom: 1.25rem;
+}
+.merge-warning ul, .merge-warning p { margin-bottom: .5rem; }
+.merge-warning p:last-child { margin-bottom: 0; }
+.merge-list li { margin-bottom: .35rem; }
+.merge-after { color: var(--muted-text-color); font-size: .9rem; }
+.merge-understood { margin: 1rem 0; font-weight: 600; }
+.merge-pick .grid { margin-bottom: .5rem; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .merge-warning { background: #3b1414; color: #fecaca; }
+}
+[data-theme="dark"] .merge-warning { background: #3b1414; color: #fecaca; }

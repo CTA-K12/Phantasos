@@ -1,29 +1,10 @@
-{# Shared field partial — included by new.html.twig and edit.html.twig #}
-
-<div class="mb-3">
-    {{ form_label(form.displayName) }}
-    {{ form_widget(form.displayName) }}
-    {{ form_errors(form.displayName) }}
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.email) }}
-    {{ form_widget(form.email) }}
-    {{ form_errors(form.email) }}
-    <div class="form-text">Must match the user's Google Workspace account email.</div>
-</div>
-
-<div class="mb-3">
-    {{ form_label(form.role) }}
-    {{ form_widget(form.role) }}
-    {{ form_errors(form.role) }}
-</div>
-
-<div class="mb-3">
-    <div class="form-check">
-        {{ form_widget(form.isActive) }}
-        {{ form_label(form.isActive) }}
-    </div>
-    {{ form_errors(form.isActive) }}
-    <div class="form-text">Inactive users cannot log in and are redirected to the pending-approval page.</div>
-</div>
+{# Shared fields — included by new.html.twig and edit.html.twig #}
+{{ form_row(form.displayName) }}
+{{ form_row(form.email, {help: "Must match the user's Google Workspace account email."}) }}
+{{ form_row(form.role) }}
+<label>
+    {{ form_widget(form.isActive, {attr: {role: 'switch'}}) }}
+    Active
+</label>
+<small class="muted">Inactive users cannot sign in and land on the pending-approval page.</small>
+{{ form_errors(form.isActive) }}

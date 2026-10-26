@@ -1,17 +1,85 @@
 <!DOCTYPE html>
+{% import 'macros.html.twig' as macros %}
+{# Signed-in application shell, ported from ORMed v2 (via HealthEd): sidebar, top nav,
+   sticky breadcrumb bar with optional actions, flashes, Markdown help panel and the
+   shared confirm modal. Pages extend this and fill `breadcrumbs`, optionally
+   `breadcrumb_actions`, and `body`. Sign-in pages use public.html.twig instead. #}
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>{% block title %}CTA App{% endblock %}</title>
-        {% block head %}{% endblock %}
-        <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2232%22 height=%2232%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22%237a5af8%22 stroke-width=%222%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%2222 12 18 12 15 21 9 3 6 12 2 12%22/></svg>">
-        {% block stylesheets %}{% endblock %}
+        <title>{% block title %}{{ app_name }}{% endblock %}</title>
+        <link rel="icon" href="{{ asset('images/favicon.png') }}">
+        {% block stylesheets %}
+            <link rel="stylesheet" href="{{ asset('css/pico2.0.6.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/flexboxgrid6.3.1.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/theme.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/help-panel.css') }}">
+            <link rel="stylesheet" href="{{ asset('css/phantasos.css') }}">
+        {% endblock %}
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
+            <script src="{{ asset('js/htmx1.9.9.min.js') }}"></script>
+            <script src="{{ asset('js/hyperscript0.9.12.min.js') }}"></script>
+            <script src="{{ asset('js/theme-toggle.js') }}"></script>
+            <script src="{{ asset('js/sidebar-toggle.js') }}"></script>
+            <script src="{{ asset('js/confirm-modal.js') }}"></script>
+            <script src="{{ asset('js/help-panel.js') }}" defer></script>
         {% endblock %}
     </head>
     <body>
-        {% block body %}{% endblock %}
+        {% block sidebar %}
+            {{ include('_sidebar.html.twig') }}
+        {% endblock %}
+
+        <div id="main-wrapper">
+            <nav>
+                {% block navbar %}
+                    {{ include('_navbar.html.twig') }}
+                {% endblock %}
+            </nav>
+
+            <nav id="breadcrumbs" aria-label="breadcrumb">
+                <ul class="breadcrumb mb-0">
+                    {% block breadcrumbs %}<li>{{ app_name }}</li>{% endblock %}
+                </ul>
+                <div class="breadcrumb-actions">{% block breadcrumb_actions %}{% endblock %}</div>
+            </nav>
+
+            <main>
+                {{ include('_flashes.html.twig') }}
+                {% block body %}{% endblock %}
+            </main>
+        </div>
+
+        {# Help panel: page-aware Markdown from docs/help/<route>.md, loaded on open.
+           A <div>, not an <aside>: theme.css styles bare asides as the left sidebar. #}
+        <div id="help-offcanvas" class="help-offcanvas" role="dialog" aria-modal="true"
+             aria-labelledby="help-offcanvas-title" aria-hidden="true">
+            <div class="help-offcanvas-header">
+                <strong id="help-offcanvas-title">{{ macros.icon('circle-question') }} Help</strong>
+                <button type="button" class="help-offcanvas-close" aria-label="Close help" data-help-close>&times;</button>
+            </div>
+            <div id="help-panel-body" class="help-offcanvas-body"><p><small>Loading…</small></p></div>
+        </div>
+        <div class="help-offcanvas-backdrop" data-help-close></div>
+
+        {# Single shared confirmation modal, fed by macros.confirmAction / confirmActionButton. #}
+        <div class="modal-backdrop" id="confirm-modal" role="dialog" aria-modal="true" aria-labelledby="confirm-modal-title">
+            <div class="modal-shell" style="width: min(460px, 92vw);">
+                <article>
+                    <header><strong id="confirm-modal-title"></strong></header>
+                    <p id="confirm-modal-body"></p>
+                    <label id="confirm-modal-reason-wrap" hidden>
+                        Reason <small>(optional)</small>
+                        <input type="text" id="confirm-modal-reason" autocomplete="off">
+                    </label>
+                    <footer style="display: flex; gap: 0.5rem; justify-content: flex-end;">
+                        <button type="button" class="secondary outline" id="confirm-modal-cancel" style="margin: 0;">Cancel</button>
+                        <button type="button" id="confirm-modal-ok" style="margin: 0;"></button>
+                    </footer>
+                </article>
+            </div>
+        </div>
     </body>
 </html>

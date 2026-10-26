@@ -2,11 +2,17 @@
 
 namespace App\Twig;
 
+use App\Repository\MediaRepository;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
 class AppExtension extends AbstractExtension
 {
+    public function __construct(
+        private readonly MediaRepository $mediaRepository,
+    ) {
+    }
+
     private const AVATAR_COLORS = [
         '#7a5af8', // primary purple
         '#6d28d9', // deep purple
@@ -23,6 +29,7 @@ class AppExtension extends AbstractExtension
         return [
             new TwigFunction('initials', [$this, 'getInitials']),
             new TwigFunction('avatar_color', [$this, 'getAvatarColor']),
+            new TwigFunction('processing_problem_count', [$this->mediaRepository, 'countProblems']),
         ];
     }
 

@@ -1,33 +1,21 @@
-{% extends 'layout.html.twig' %}
+{% extends 'base.html.twig' %}
 
-{% block title %}New User — Admin{% endblock %}
+{% block title %}New User — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{{ path('admin_user_index') }}">Users</a></li>
+    <li>New</li>
+{% endblock %}
 
-{% block content %}
-
-<div class="row align-items-center mb-4 g-3">
-    <div class="col-12 col-md">
-        <h4 class="mb-0">New User</h4>
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-lg-6 mx-auto">
-        {{ form_start(form) }}
-        <div class="card">
-            <div class="card-body">
-                {% include 'admin/user/_form.html.twig' %}
-            </div>
-            <div class="card-footer d-flex justify-content-between align-items-center">
-                <a href="{{ path('admin_user_index') }}" class="btn btn-outline-secondary btn-sm">
-                    <i data-lucide="arrow-left" style="width:15px;height:15px;vertical-align:-2px;"></i> Cancel
-                </a>
-                <button type="submit" class="btn btn-primary btn-sm">
-                    <i data-lucide="user-plus" style="width:15px;height:15px;vertical-align:-2px;"></i> Create User
-                </button>
-            </div>
+{% block body %}
+<article style="max-width: 40rem;">
+    <header><strong>New User</strong></header>
+    {{ form_start(form) }}
+        {% include 'admin/user/_form.html.twig' %}
+        {{ form_rest(form) }}
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;">
+            <a role="button" class="secondary outline" href="{{ path('admin_user_index') }}">Cancel</a>
+            <button type="submit" style="width: auto;">Create user</button>
         </div>
-        {{ form_end(form) }}
-    </div>
-</div>
-
+    {{ form_end(form) }}
+</article>
 {% endblock %}

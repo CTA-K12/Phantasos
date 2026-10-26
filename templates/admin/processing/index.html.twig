@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}Processing — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}<li>Processing</li>{% endblock %}
+{% block breadcrumb_actions %}
+    {% if failed|length + stuck|length > 0 %}
+        {{ macros.confirmActionButton(path('admin_processing_retry_all'), csrf_token('processing-retry-all'),
+            'Retry all', 'Retry all ' ~ (failed|length + stuck|length) ~ ' media?',
+            'Every failed and stuck item below goes back on the processing queue.', 'Retry all', 'warning') }}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+<div class="stat-row">
+    <article><span class="stat-value">{{ queue.waiting }}</span><span class="stat-label">waiting in queue</span></article>
+    <article><span class="stat-value">{{ queue.running }}</span><span class="stat-label">being processed</span></article>
+    <article><span class="stat-value">{{ failed|length }}</span><span class="stat-label">failed</span></article>
+    <article><span class="stat-value">{{ stuck|length }}</span><span class="stat-label">stuck &gt; {{ stuckAfter }}</span></article>
+</div>
+
+<article>
+    <header><strong>Failed to process</strong></header>
+    <p class="muted">The worker tried three times and gave up. Usually a corrupt or unusual file; the worker log has the reason.</p>
+    {{ include('admin/_media_table.html.twig', {media: failed, show_client: true, retry: true}) }}
+</article>
+
+<article>
+    <header><strong>Stuck</strong></header>
+    <p class="muted">Uploaded more than {{ stuckAfter }} ago and still queued or processing — normally means the worker was down
+    or a job was lost. If the worker is running, retry them.</p>
+    {{ include('admin/_media_table.html.twig', {media: stuck, show_client: true, retry: true}) }}
+</article>
+{% endblock %}

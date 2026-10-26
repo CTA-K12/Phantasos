@@ -2,7 +2,7 @@
 #
 #   app  PHP-FPM (default CMD) and, with a different command, the Messenger
 #        worker: `php bin/console messenger:consume async ...`. Includes ffmpeg.
-#   web  nginx: TLS, static assets, and file delivery via X-Accel-Redirect.
+#   web  nginx: TLS, static assets (public/css, js, images), and file delivery via X-Accel-Redirect.
 #
 # Build (from the repo root):
 #   docker build --platform linux/amd64 -f .docker/Dockerfile --target app -t <registry>/phantasos-app:<tag> .
@@ -47,8 +47,7 @@ COPY . .
 COPY .docker/php/env.defaults .env
 RUN composer dump-autoload --no-dev --classmap-authoritative \
  && APP_SECRET=build-only DATABASE_URL='postgresql://x:x@localhost:5432/x?serverVersion=17' \
-    GOOGLE_CLIENT_SECRET=build-only \
-    sh -c 'php bin/console importmap:install && php bin/console asset-map:compile && php bin/console cache:warmup' \
+    GOOGLE_CLIENT_SECRET=build-only php bin/console cache:warmup \
  && rm -rf var/log/*
 
 # ── app: PHP-FPM / worker ────────────────────────────────────────────────────
@@ -70,6 +69,7 @@ RUN apk add --no-cache nginx \
 
 COPY .docker/nginx/nginx.conf /etc/nginx/nginx.conf
 COPY .docker/nginx/phantasos.conf /etc/nginx/http.d/phantasos.conf
+COPY .docker/nginx/admin-access.conf /etc/nginx/admin-access.conf
 COPY --from=build /var/www/phantasos/public /var/www/phantasos/public
 
 USER nginx

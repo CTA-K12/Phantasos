@@ -1,6 +1,6 @@
 {
-    "name": "cta/symfony-starter",
-    "description": "CTA Symfony Starter Template — Symfony 7.4, Bootstrap 5, Turbo, Google OAuth",
+    "name": "cta/phantasos",
+    "description": "Phantasos — media upload, processing and delivery API (CTA)",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
@@ -15,7 +15,7 @@
         "knpuniversity/oauth2-client-bundle": "^2.20",
         "league/commonmark": "^2.10.4",
         "league/oauth2-google": "^5.0",
-        "symfony/asset-mapper": "7.4.*",
+        "symfony/asset": "7.4.*",
         "symfony/console": "7.4.*",
         "symfony/doctrine-messenger": "7.4.*",
         "symfony/dotenv": "7.4.*",
@@ -29,10 +29,8 @@
         "symfony/process": "7.4.*",
         "symfony/runtime": "7.4.*",
         "symfony/security-bundle": "7.4.*",
-        "symfony/stimulus-bundle": "^2.36",
         "symfony/twig-bundle": "7.4.*",
         "symfony/uid": "7.4.*",
-        "symfony/ux-turbo": "^2.36",
         "symfony/validator": "7.4.*",
         "symfony/yaml": "7.4.*",
         "twig/extra-bundle": "^2.12|^3.29",
@@ -72,8 +70,7 @@
     "scripts": {
         "auto-scripts": {
             "cache:clear": "symfony-cmd",
-            "assets:install %PUBLIC_DIR%": "symfony-cmd",
-            "importmap:install": "symfony-cmd"
+            "assets:install %PUBLIC_DIR%": "symfony-cmd"
         },
         "post-install-cmd": [
             "@auto-scripts"

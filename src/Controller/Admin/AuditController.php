@@ -30,7 +30,7 @@ class AuditController extends AbstractController
     #[Route('', name: 'admin_audit_index', methods: ['GET'])]
     public function index(Request $request): Response
     {
-        $activeTab = $request->query->getString('tab', 'retention') === 'log' ? 'log' : 'retention';
+        $activeTab = $request->query->getString('tab', 'log') === 'retention' ? 'retention' : 'log';
 
         // ── Retention tab data ────────────────────────────────────────────────
         $retentionMonths = (int) $this->settings->get('data_retention_months', '36');
@@ -85,7 +85,7 @@ class AuditController extends AbstractController
     public function retention(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('audit-retention', $request->request->getString('_token'))) {
-            $this->addFlash('danger', 'Invalid security token.');
+            $this->addFlash('error', 'Invalid security token.');
             return $this->redirectToRoute('admin_audit_index', ['tab' => 'retention']);
         }
 
@@ -100,7 +100,7 @@ class AuditController extends AbstractController
     public function purge(Request $request): Response
     {
         if (!$this->isCsrfTokenValid('audit-purge', $request->request->getString('_token'))) {
-            $this->addFlash('danger', 'Invalid security token.');
+            $this->addFlash('error', 'Invalid security token.');
             return $this->redirectToRoute('admin_audit_index', ['tab' => 'retention']);
         }
 

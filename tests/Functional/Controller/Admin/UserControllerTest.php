@@ -42,7 +42,7 @@ class UserControllerTest extends WebTestCase
         $this->loginAs('dcramble@mesd.k12.or.us');
         $this->client->request('GET', '/admin/users');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Users');
+        $this->assertSelectorTextContains('#breadcrumbs', 'Users');
     }
 
     // ── Index content ────────────────────────────────────────────────────────
@@ -65,7 +65,7 @@ class UserControllerTest extends WebTestCase
         $this->loginAs('dcramble@mesd.k12.or.us');
         $this->client->request('GET', '/admin/users/new');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'New User');
+        $this->assertSelectorTextContains('article header', 'New User');
     }
 
     public function test_create_user_redirects_on_success(): void
@@ -117,7 +117,7 @@ class UserControllerTest extends WebTestCase
 
         $this->client->request('GET', '/admin/users/' . $user->getId() . '/edit');
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h4', 'Edit User');
+        $this->assertSelectorTextContains('article header', 'Edit');
     }
 
     public function test_edit_form_prepopulates_user_data(): void

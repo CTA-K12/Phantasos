@@ -6,6 +6,8 @@ use App\Repository\ApiClientRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 
@@ -16,6 +18,7 @@ use Symfony\Component\Uid\Uuid;
  * unsalted hash is enough to make a database leak useless while keeping lookups indexed.
  */
 #[ORM\Entity(repositoryClass: ApiClientRepository::class)]
+#[UniqueEntity(fields: ['name'], message: 'A client with this name already exists.')]
 class ApiClient implements UserInterface
 {
     #[ORM\Id]
@@ -23,6 +26,9 @@ class ApiClient implements UserInterface
     private Uuid $id;
 
     #[ORM\Column(length: 100, unique: true)]
+    #[Assert\NotBlank]
+    #[Assert\Length(min: 2, max: 100)]
+    #[Assert\Regex(pattern: '/^[A-Za-z0-9][A-Za-z0-9 ._-]*$/', message: 'Use letters, digits, spaces, dots, dashes and underscores.')]
     private string $name;
 
     /** applicationName in the legacy system, when it differs; used by the import. */
@@ -39,6 +45,7 @@ class ApiClient implements UserInterface
     private ?string $contactName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\Email]
     private ?string $contactEmail = null;
 
     #[ORM\Column]
@@ -77,15 +84,6 @@ class ApiClient implements UserInterface
     {
         $this->name = $name;
         return $this;
-    }
-
-    /**
-     * Name reported as `owner` in mediaInfo. Imported clients keep their legacy name there
-     * so renaming a client never changes what consumers see.
-     */
-    public function getPublicOwnerName(): string
-    {
-        return $this->legacyName ?? $this->name;
     }
 
     public function getLegacyName(): ?string

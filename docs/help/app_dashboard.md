@@ -1,13 +1,7 @@
 # Dashboard
 
-The Dashboard gives you a high-level overview of application activity.
-
-## Charts
-
-The Dashboard includes chart visualizations to help you understand trends and patterns.
-
-Click any chart legend item to toggle that data series on or off.
-
-## Customizing
-
-Additional charts and filters can be added by extending the dashboard template and data endpoint. See `src/Controller/DashboardController.php` and `templates/dashboard/index.html.twig`.
+- **Uploads** count media whose file arrived (tickets that were never used are not counted).
+- **Files served** counts `requestMedia` downloads, from the audit log.
+- **In processing queue** is the number of uploads waiting for, or being worked on by, the worker.
+  If it keeps growing, the worker may be down.
+- **Failed or stuck** links to the Processing page, where they can be retried.

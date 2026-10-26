@@ -479,6 +479,26 @@ State of the `php8_upgrade` working tree. Everything below is implemented and te
 - They are the public IDs, and they decide the disk path `<id0:5>/<id5:10>/<id10:15>/<id>/`.
 - API keys are stored only as SHA-256 (`api_client.key_hash`), so imported keys keep working unchanged.
 
+**Management site (2026-10-25)**
+- Layout ported from ORMed v2 (via HealthEd): Pico/htmx/hyperscript static assets; the starter's
+  Bootstrap/Turbo/Stimulus/AssetMapper front end and its Settings/Support pages were removed.
+- Clients & Keys: list with media counts and last use, create (48-hex key shown once, only its
+  SHA-256 stored), edit, rotate (old key refused immediately), deactivate/reactivate. Audited as
+  `client.*` with an optional reason.
+- Processing: failed media and "stuck" media (uploaded, still queued/processing after 6 h) with
+  retry and retry-all (`media.reprocessed`). Replaces the legacy `reprocess` command. Messenger's
+  failure transport was dropped: the media row's "Failed to process" status is the record.
+- Dashboard: active clients, media stored, uploads and files served in the last 7 days, queue
+  depth, failed/stuck count, recent uploads.
+- nginx serves `/api/` publicly; everything else (sign-in, admin, static files) only to the
+  ranges in `/etc/nginx/admin-access.conf` (default: private ranges; override by mounting).
+
+**appdev-pg-prod contents (2026-10-25):** real data only, no fixtures. The 5 clients, 39,486
+media and 43,350 files come from the import. The four CTA admins (`dcramble`, `thand`, `staylor`, `jdhruv`
+@mesd.k12.or.us) were created with `app:user:create`; Google fills in names and photos at first
+sign-in. Local `symfony serve` can use it via `DATABASE_URL` in `.env.local`. Tests always use the
+local `_test` database.
+
 **Contract evidence**
 - `migration/capture_contract.py` recorded legacy responses into `tests/Contract/fixtures/legacy/`. In those fixtures the `raw` field is authoritative; the parsed `json` has sorted keys.
 - `tests/Contract/LegacyApiContractTest.php` replays them byte for byte.
@@ -488,10 +508,10 @@ State of the `php8_upgrade` working tree. Everything below is implemented and te
 - Ownership is enforced. requestMedia and mediaInfo for another app's media return 404. Legacy served any file to any key.
 - Unknown or malformed IDs return 404, not 500. Both mediaInfo not-found cases return "Media was not found".
 - Files are served with `Cache-Control: private`, not `public`.
-- `owner` in mediaInfo reports `api_client.legacy_name` when set, so renamed clients still show `Events` and `NurseDocsDev` to consumers.
+- `owner` in mediaInfo reports the current client name, so renamed clients show `HealthEdTrainingsMESD` and `DocGuard`. `legacy_name` is used only by the import.
 - New audio produces only `low.mp3` and `high.mp3`; new video produces only `small`/`large` `-frame.png` and `.mp4`. Imported media keep their existing webm, ogv and oga files.
 - Video is letterboxed to exactly 640×360 and 1280×720.
-- **Open: Word and Excel processors are not built.** The current data has zero word or excel media, and Office parsers have a long record of XML vulnerabilities. Such uploads now get `400 Filetype "…" is not supported.`. Decide before cutover whether to add them (PhpSpreadsheet / PHPWord).
+- **Word and Excel are not supported (decided 2026-10-25).** Only PDF, images, audio and video are accepted, as originally intended, and Office uploads get `400 Filetype "…" is not supported.`. Revisit for ORMed, where docx/xlsx attachments are likely.
 
 **Legacy behaviour kept on purpose**
 - Image renditions are stretched to the exact box size, with "72ppi" in `bitrate`.

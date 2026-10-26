@@ -1,0 +1,857 @@
+:root {
+    --pico-spacing: 0.9rem;
+    --pico-font-size: 16px;
+    --pico-form-element-spacing-vertical: 0.5rem;
+    --pico-form-element-spacing-horizontal: 0.5rem;
+    --pico-typography-spacing-vertical: 1rem;
+    --table-row-hover: #f5f5f5;
+}
+
+[data-theme=light],
+:root:not([data-theme=dark]) {
+  color-scheme: light;
+  --form-element-background-color: #fff;
+  --sidebar-background-color: #3c4b64;
+  --sidebar-brand-background-color: rgba(0, 0, 21, 0.2);
+  --sidebar-color: rgba(255, 255, 255, 0.8);
+  --background-color: #eee;
+  --card-background-color: #fff;
+  --breadcrumbs-border-color: #eee;
+  --breadcrumbs-box-shadow: 0 2px 2px 0 rgba(27, 40, 50, 0.2);
+  --active-dark: #0172ad;
+  
+}
+
+[data-theme=dark] {
+  color-scheme: dark;
+  --sidebar-background-color: #18232c;
+  --sidebar-brand-background-color: #18232c;
+  --sidebar-color: rgba(255, 255, 255, 0.8);
+  --card-background-color: #18232c;
+  --breadcrumbs-border-color: #333;
+  --breadcrumbs-box-shadow: var(--pico-card-box-shadow);
+  --background-color: #13171f;
+  --table-row-hover: #24313d;
+}
+
+theme-toggle {
+  --toggle-foreground-color: var(--pico-color);
+  --toggle-background-color: var(--background-color);
+}
+
+sidebar-toggle {
+  --toggle-foreground-color: var(--pico-color);
+  margin-left: 16px;
+}
+
+.true-check {
+  color: var(--pico-ins-color);
+}
+
+.false-check {
+  color: var(--pico-del-color);
+}
+
+body {
+  display: flex;
+  flex-wrap: nowrap;
+}
+
+#main-wrapper {
+  flex-basis: 0;
+  flex-grow: 999;
+  /* A flex item will not shrink below its widest content, so without this one
+     wide grid widened the whole column — tab bar, filters and all — past the
+     window whenever the sidebar was open. */
+  min-width: 0;
+  padding-right: 0 !important;
+  padding-left: 0 !important;
+}
+
+main {
+  min-inline-size: 0%;
+  --block-spacing-vertical: var(--pico-spacing) !important;
+  padding-right: var(--pico-spacing) !important;
+  padding-left: var(--pico-spacing) !important;
+}
+
+aside {
+  position: sticky;
+  top: 0;
+  left: 0;
+  z-index: 20;
+  background: var(--sidebar-background-color);
+  height: 100vh;
+  padding-left: calc(var(--pico-spacing) - 0.75rem) !important;
+  padding-right: calc(var(--pico-spacing) - 0.75rem) !important;
+  box-shadow: var(--pico-card-box-shadow);
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  height: 60px;
+  flex-shrink: 0;
+  background-color: var(--sidebar-brand-background-color);
+  margin-left: -4px;
+  margin-right: -4px;
+  padding: 4px 8px;
+  text-decoration: none;
+}
+
+.sidebar-brand img {
+  height: 36px;
+  width: 36px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand__text {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.3rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* Open sidebar: a little extra breathing room on the left. */
+aside.open .sidebar-brand {
+  padding-left: 15px;
+}
+
+/* Collapsed sidebar: hide the wordmark, center the logo. */
+aside:not(.open) .sidebar-brand {
+  justify-content: center;
+  padding: 4px;
+}
+
+aside:not(.open) .sidebar-brand__text {
+  display: none;
+}
+
+aside nav {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-width: none; /* Firefox */
+}
+
+aside nav::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+aside:not(.open) {
+ flex-basis: 64px;
+}
+
+aside:not(.open) .brand {
+  display: none;
+ }
+
+
+aside:not(.open) nav ul li a span {
+  display: none;
+}
+
+aside.open {
+  flex-basis: 220px;
+}
+
+aside.open nav ul li a span {
+  animation-delay: 0.2s;
+  padding-left: 8px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+
+#breadcrumbs {
+  position: sticky;
+  top: 60px;
+  z-index: 2;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--card-background-color);
+  border-top: solid 1px var(--breadcrumbs-border-color);
+}
+
+#breadcrumbs .breadcrumb {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+
+#breadcrumbs li:first-child {
+  margin-left: 16px;
+}
+
+#breadcrumbs a:not([role="button"]) {
+  color: var(--h1-color);
+  font-weight: 500;
+}
+
+.breadcrumb-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-right: 0.75rem;
+}
+
+.breadcrumb-action-btn {
+  margin: 0 0.75rem 0 0;
+  padding: 0.3rem 0.9rem;
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.breadcrumb-actions .breadcrumb-action-btn {
+  margin-right: 0;
+}
+
+.breadcrumb-action-btn--disabled {
+  /* Explicit muted colors instead of opacity - opacity applies to the whole
+     element's render, including its ::before/::after pseudo-elements, which
+     is how the [data-tooltip] popover is drawn. That faded the tooltip too,
+     instead of just the button. */
+  cursor: not-allowed;
+  color: var(--muted-text-color);
+  background-color: var(--muted-border-color, #ccc);
+  border-color: var(--muted-border-color, #ccc);
+}
+
+.menu-opener {
+  margin-left: 16px;
+}
+
+.menu-opener svg {
+  display: inline-flex;
+  transform: scale(1.25);
+  align-self: center;
+}
+
+.menu-opener svg:hover {
+  display: inline-flex;
+  transform: scale(1.3);
+  color: var(--contrast);
+}
+
+aside nav ul li:hover {
+  background-color: var(--pico-primary);
+  color: var(--pico-contrast);
+}
+
+aside nav ul li.active {
+  background-color: #0172ad;
+  color: var(--pico-contrast);
+}
+
+aside nav ul li a {
+  color: var(--sidebar-color);
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  margin-left: 4px;
+  margin-right: 4px;
+  text-decoration: none;
+  white-space: nowrap;
+  border-radius: 0;
+  transition: background .15s ease,color .15s ease;
+}
+
+aside nav ul {
+  width: 100%;
+}
+
+aside nav ul li a svg {
+  display: inline-block;
+  transform: scale(1.25);
+  margin: 0;
+}
+
+aside nav ul:first-child {
+  margin-right: 0;
+}
+
+aside nav ul:last-child {
+  margin-left: 0;
+}
+
+#main-wrapper > nav:first-of-type {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  height: 60px;
+  background: var(--card-background-color);
+  padding-right: 16px;
+}
+
+/* ── Navbar icon controls ─────────────────────────────────────────────── */
+
+/* Shared height token — biller select and icon-group pill both snap to this */
+:root {
+  --nav-control-height: 32px;
+}
+
+/* Groups theme + help into a pill for visual unity */
+.nav-icon-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  height: var(--nav-control-height);
+  background: color-mix(in srgb, var(--pico-muted-color, #888) 10%, transparent);
+  border: 1px solid var(--muted-border-color, rgba(0,0,0,0.12));
+  border-radius: 2rem;
+  padding: 2px 4px;
+  box-sizing: border-box;
+}
+
+[data-theme="dark"] .nav-icon-group {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.nav-icon-btn {
+  background: transparent;
+  border: none;
+  padding: 0 0.4rem;
+  margin: 0;
+  height: 100%;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+  color: var(--pico-muted-color, #666);
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+
+.nav-icon-btn:hover,
+.nav-icon-btn:focus {
+  background: color-mix(in srgb, var(--pico-primary, #0172ad) 12%, transparent);
+  color: var(--pico-primary, #0172ad);
+  outline: none;
+}
+
+theme-toggle {
+  padding: 0 0.4rem;
+  height: 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1.5rem;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+theme-toggle:hover {
+  background: color-mix(in srgb, var(--pico-primary, #0172ad) 12%, transparent);
+}
+
+/* Biller selector — same height as the icon-group pill */
+.nav-biller-select {
+  height: var(--nav-control-height) !important;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+  box-sizing: border-box;
+}
+
+#main-wrapper > nav:last-of-type {
+  box-shadow: var(--breadcrumbs-box-shadow);
+}
+
+body > nav ul li form {
+  margin-bottom: 0;
+}
+
+body > nav ul li form input[type="search"] {
+  margin-bottom: 0;
+}
+
+summary > img {
+  height: 32px;
+  width: 32px;
+  border-radius: 16px;
+}
+
+th {
+  font-weight: 600;
+}
+
+td {
+  font-size: 14px;
+}
+
+td > img {
+  height: 32px;
+  width: 32px;
+  border-radius: 16px;
+}
+
+td > a[role="button"] {
+  font-size: 14px;
+  padding: 4px;
+}
+
+div[role="group"] > a[role="button"] {
+  font-size: 14px;
+  padding: 4px;
+}
+
+td > div[role="group"] {
+  width: fit-content;
+}
+
+td div[role="group"],
+td details.dropdown {
+  margin-bottom: 0;
+}
+
+td > div[role="group"] > a[role="button"] {
+  min-width: 100px;
+  max-width: 100px;
+}
+
+summary[role="button"] {
+  font-size: 14px;
+  padding: 4px;
+  max-width: 200px;
+}
+
+.dropdown > ul > li > a {
+  font-size: 22px;
+  margin: 1rem;
+}
+
+h4 > a[role="button"] {
+  font-size: 14px;
+  padding: 5px 10px 5px 10px;
+  margin-left: 10px;
+}
+
+article {
+  margin-top: var(--pico-spacing);
+}
+
+article > header > nav > ul > li > a[role="button"] {
+  font-size: 14px;
+  padding: 5px 10px 5px 10px;
+}
+
+td > a[role="button"] > svg {
+  transform: scale(0.75);
+}
+
+article > header > nav > ul > li {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+dt {
+  font-weight: 600;
+}
+
+dd {
+  min-height: 24px;
+  margin-bottom: 6px;
+}
+
+.fullwidth {
+  width: 100%;
+}
+
+.tooltip {
+  position: relative;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  left: 80%;
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+table[role="grid"] tbody tr:hover td {
+  background-color: var(--table-row-hover) !important;
+}
+
+.red-text {
+  color: var(--pico-del-color);
+}
+.green-text {
+  color: var(--pico-ins-color); 
+} 
+.grey-text {
+  color: var(--pico-muted-color);
+}
+
+/* Wraps, rather than overflowing. This was `nowrap`, which on a narrow window
+   pushed the right-hand filters off the edge instead of moving them down — and
+   a toolbar you cannot reach is worse than a taller one. Ten screens use this,
+   and all of them had the same latent problem; the Lines grid only surfaced it
+   first because it carries the most controls. */
+.grid-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+/* A flex-basis rather than `auto` so the search box has a width to shrink
+   toward before the row breaks, instead of collapsing to its content. */
+.grid-toolbar__search {
+  flex: 1 1 260px;
+  min-width: 0;
+}
+
+.grid-toolbar__search input[type="search"] {
+  width: 100%;
+  margin-bottom: 0;
+}
+
+.grid-toolbar__dates {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  /* Shrinkable and wrapping: a group of date inputs and filter dropdowns should
+     rearrange inside itself before forcing the whole toolbar to break. */
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+}
+
+/* A filter group dense enough that squeezing it beside the search box helps
+   nobody. Below this width it takes a row of its own and its contents wrap
+   within that row. */
+@media (max-width: 1200px) {
+  .grid-toolbar__group {
+    flex-basis: 100%;
+  }
+}
+
+.grid-toolbar__dates input[type="date"] {
+  width: auto;
+  margin-bottom: 0;
+}
+
+/* A filter row whose dropdowns and date boxes share out the row's width,
+   rather than sitting at their smallest with empty space at the end. Labels
+   and toggles keep their own size. When the row wraps, each line fills too. */
+.grid-toolbar--fill > .filter-dropdown,
+.grid-toolbar--fill > input[type="date"] {
+  flex: 1 1 9.5rem;
+}
+
+.grid-toolbar--fill > .filter-dropdown > .filter-dropdown__toggle {
+  width: 100%;
+}
+
+/* ── Sidebar footer: user identity at the bottom ──────────────────────── */
+
+.sidebar-footer {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 10px 12px;
+  min-height: 56px;
+}
+
+.sidebar-footer__info {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* The name and email link to My settings, without looking like a link. */
+a.sidebar-footer__info,
+a.sidebar-footer__info:hover {
+  color: inherit;
+  text-decoration: none;
+}
+
+a.sidebar-footer__info:hover .sidebar-footer__name,
+a.sidebar-footer__info:focus-visible .sidebar-footer__name {
+  text-decoration: underline;
+}
+
+.sidebar-footer__mask-badge {
+  display: inline-block;
+  align-self: flex-start;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #92400e;
+  background: #fde68a;
+  border-radius: 3px;
+  padding: 1px 5px;
+  line-height: 1.5;
+  margin-bottom: 1px;
+}
+
+.sidebar-footer__name {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.95);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+
+.sidebar-footer__email {
+  font-size: 0.68rem;
+  color: rgba(255, 255, 255, 0.5);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.35;
+}
+
+.sidebar-footer__action {
+  flex-shrink: 0;
+  margin: 0;
+  padding-left: 10px;
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.sidebar-footer__action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-footer__action-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.sidebar-footer__action-btn svg {
+  display: block;
+}
+
+/* Collapsed sidebar: hide text and sign-out, center avatar */
+aside:not(.open) .sidebar-footer {
+  justify-content: center;
+  padding: 10px 0;
+}
+
+aside:not(.open) .sidebar-footer__info,
+aside:not(.open) .sidebar-footer__action {
+  display: none;
+}
+/* ── Grid toolbar filter dropdown ─────────────────────────────────────────
+   A labelled button that opens a checkbox list with All / Clear / Apply.
+   Markup: templates/components/_filter_dropdown.html.twig
+
+   It sits among the date inputs and should read as the same kind of control,
+   so it borrows their border, height and colours rather than looking like a
+   button you press. Selection state is carried by the TEXT ("Status: All" vs
+   "Status (3)"), not by colouring the control — a coloured, ringed box in a
+   toolbar reads as an action, and this is a field. */
+
+.filter-dropdown {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.filter-dropdown__toggle {
+  /* Pico rebinds --pico-color ON buttons, so inheriting it here paints the
+     label in a button colour against the form background — which at rest was
+     white on white, and the label vanished. These two are not rebound. */
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: auto;
+  min-width: 9.5rem;
+  margin-bottom: 0;
+  padding: var(--pico-form-element-spacing-vertical) var(--pico-form-element-spacing-horizontal);
+  font-size: inherit;
+  font-weight: normal;
+  line-height: var(--pico-line-height);
+  white-space: nowrap;
+  color: var(--pico-form-element-color);
+  background: var(--pico-form-element-background-color);
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  cursor: pointer;
+}
+
+.filter-dropdown__toggle:hover {
+  background: var(--pico-form-element-background-color);
+  border-color: var(--pico-form-element-active-border-color);
+  color: var(--pico-form-element-color);
+}
+
+/* Pico rings buttons on :focus, which fires on a mouse click too and left the
+   control looking pressed. Keyboard users still get the ring. */
+.filter-dropdown__toggle:focus {
+  box-shadow: none;
+}
+
+.filter-dropdown__toggle:focus-visible {
+  box-shadow: 0 0 0 var(--pico-outline-width) var(--pico-form-element-focus-color);
+}
+
+.filter-dropdown__caret {
+  flex: 0 0 auto;
+  border-top: 5px solid currentColor;
+  border-right: 4px solid transparent;
+  border-left: 4px solid transparent;
+  opacity: 0.55;
+}
+
+.filter-dropdown__panel {
+  /* Anchored to the RIGHT edge: this control lives at the right end of the
+     toolbar, so a left-anchored panel runs off the page. */
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: auto;
+  z-index: 50;
+  min-width: 100%;
+  padding: 0.5rem 0;
+  background: var(--pico-background-color);
+  border: var(--pico-border-width) solid var(--pico-form-element-border-color);
+  border-radius: var(--pico-border-radius);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 18%);
+}
+
+/* Flipped by JS when right-anchoring would run off the left instead. */
+.filter-dropdown__panel--left {
+  right: auto;
+  left: 0;
+}
+
+/* Search box, rendered only for lists long enough to need one (see the
+   component's `searchFrom` threshold). Sits above the All/Clear shortcuts so
+   the reading order is: narrow the list, then act on what is left. */
+.filter-dropdown__search {
+  padding: 0 0.9rem 0.5rem;
+}
+
+.filter-dropdown__search-input {
+  width: 100%;
+  height: auto;
+  margin: 0;
+  padding: 0.3rem 0.55rem;
+  font-size: 0.85rem;
+}
+
+.filter-dropdown__shortcuts {
+  display: flex;
+  justify-content: space-between;
+  gap: 1.5rem;
+  padding: 0 0.9rem 0.5rem;
+  border-bottom: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.filter-dropdown__link {
+  width: auto;
+  margin: 0;
+  padding: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--pico-primary);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.filter-dropdown__link:hover {
+  color: var(--pico-primary-hover);
+  background: none;
+}
+
+.filter-dropdown__list {
+  max-height: 15rem;
+  margin: 0;
+  padding: 0.35rem 0;
+  overflow-y: auto;
+  list-style: none;
+}
+
+.filter-dropdown__list li {
+  margin: 0;
+  padding: 0;
+}
+
+.filter-dropdown__option {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 0.35rem 0.9rem;
+  font-size: 0.9rem;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.filter-dropdown__option:hover {
+  background: var(--pico-secondary-background);
+  color: var(--pico-secondary-inverse);
+}
+
+.filter-dropdown__option input[type="checkbox"] {
+  flex: 0 0 auto;
+  margin: 0;
+}
+
+/* How many rows this option would leave you with. Pushed to the right so the
+   labels still read as a single column and the numbers as another. */
+.filter-dropdown__count {
+  margin-left: auto;
+  padding-left: 0.75rem;
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--pico-muted-color);
+}
+
+/* Zero means the other filters have ruled this option out and it is only still
+   listed because it is ticked. Dimmed rather than hidden: removing it would
+   leave the grid empty with nothing on screen saying which choice did it. */
+.filter-dropdown__option--empty .filter-dropdown__option {
+  opacity: 0.55;
+}
+
+.filter-dropdown__footer {
+  padding: 0.5rem 0.9rem 0;
+  border-top: var(--pico-border-width) solid var(--pico-muted-border-color);
+}
+
+.filter-dropdown__apply {
+  width: 100%;
+  margin: 0;
+  padding: 0.35rem;
+  font-size: 0.85rem;
+}

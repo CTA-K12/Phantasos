@@ -1,0 +1,13 @@
+{% import 'macros.html.twig' as macros %}
+<ul>
+    <sidebar-toggle></sidebar-toggle>
+</ul>
+<ul>
+    <li class="nav-icon-group">
+        <theme-toggle></theme-toggle>
+        <button type="button" id="helpToggleBtn" class="nav-icon-btn" aria-label="Help for this page" title="Help"
+                data-help-page="{{ app.request.attributes.get('_route') ?? '' }}">
+            {{ macros.icon('circle-question') }}
+        </button>
+    </li>
+</ul>

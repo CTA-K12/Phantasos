@@ -22,6 +22,8 @@ The legacy code is at the git tag `legacy-final` (`git show legacy-final:src/...
   send keys in the query string, so never log query strings (nginx logs the path only).
 - **Never commit secrets.** Runtime config comes from the environment; `.env*` files other than
   `.env.example`/`.env.test` are gitignored, as is `migration/secrets/`.
+- **Fixtures never touch appdev-pg-prod**: `doctrine:fixtures:load` purges every table, so
+  `FixturesGuard` refuses any non-local database host.
 - **The test suite must never point at appdev-pg-prod.** It uses the local container's
   `phantasos_dev_test` database.
 - Keep personal names and "who decided" phrasing out of tracked files; state decisions with dates.
@@ -35,7 +37,9 @@ The legacy code is at the git tag `legacy-final` (`git show legacy-final:src/...
 - ffmpeg/ffprobe (audio/video), GD (images), via `Symfony\Component\Process` — no PHP media bindings.
 - Containers: `.docker/Dockerfile` targets `app` (PHP-FPM, and the worker via `messenger:consume`)
   and `web` (nginx). Runs under Podman Quadlet on `phantasos.apps.cascadetech.org` (`deploy/`).
-- Admin UI (in progress) uses the CTA starter: Google OAuth, `app_user`, AuditLogger, help panel.
+- Management site (internal networks only, enforced by nginx): Google OAuth sign-in, `app_user`
+  roles, AuditLogger — from the CTA starter — with the ORMed v2 / HealthEd layout (Pico 2,
+  flexboxgrid, htmx + hyperscript, static files in `public/`; no AssetMapper, Bootstrap or Turbo).
 
 ## Layout
 
@@ -49,6 +53,9 @@ src/Service/MediaInfoPresenter.php     legacy mediaInfo JSON shape
 src/Service/MediaFileResponder.php     X-Accel-Redirect (prod) / BinaryFileResponse (dev, tests)
 src/Processor/                         Image, Pdf, Audio, Video (tag app.processor)
 src/MessageHandler/ProcessMediaHandler.php   the worker
+src/Controller/Admin/                  Clients & Keys, Processing (retry), Users, Audit Log (ROLE_ADMIN)
+templates/base.html.twig               signed-in shell (sidebar, breadcrumbs, help panel, confirm modal)
+templates/public.html.twig             pre-sign-in shell; macros.html.twig = icons, iconBtn, confirmAction
 migration/                             Python tooling (own venv at .venv): legacy inspection/purge,
                                        capture_contract.py, import_to_pg.py, parity_check.py
 tests/Contract/                        legacy contract replay (fixtures/legacy/*.json)
@@ -61,6 +68,19 @@ Implement `App\Processor\ProcessorInterface` (media type, sniffed MIME types, `p
 auto-tagged. Write renditions into `MediaStorage::mediaDirectory($media)`, register each with
 `MediaStorage::addRendition()` **in the order mediaInfo should list them** (the original is always
 position 0), and drive `ProgressReporter` phases. The handler sets Ready/100 and sends the callback.
+
+## Management UI conventions (ORMed v2 layout)
+
+- Pages extend `base.html.twig` and fill `breadcrumbs`, optional `breadcrumb_actions` (buttons with
+  class `breadcrumb-action-btn`), and `body`. Content goes in `<article>`; tables are
+  `<figure><table role="grid">`.
+- Icons: `macros.icon('name')` (inline Font Awesome Free SVGs; copy more from ORMed2's macros).
+  Row actions: `macros.iconBtn(...)`. Every POST action goes through `macros.confirmAction` /
+  `confirmActionButton` (shared modal, CSRF token, optional reason) — never `window.confirm`.
+- Flash types: `success`, `warning`, `error`, `info`.
+- Help: `docs/help/<route_name>.md`, shown in the slide-out panel (`?` in the top bar).
+- **API keys are displayed once**, in the response to the create/rotate POST (`Cache-Control:
+  no-store`), never via flash/session, and never logged — audit metadata holds names only.
 
 ## Conventions (from the CTA starter)
 
@@ -83,6 +103,7 @@ APP_ENV=test php bin/console doctrine:migrations:migrate -n && APP_ENV=test php 
 composer test                                         # PHPUnit
 composer test:stan                                    # PHPStan level 8
 php bin/console messenger:consume async -vv           # run the worker locally
+php bin/console app:user:create someone@mesd.k12.or.us --role=ROLE_ADMIN   # bootstrap a sign-in user
 
 # Legacy → PG import (dry run unless --apply). Target prod reads migration/secrets/new-pg.env.
 cd migration && ../.venv/bin/python import_to_pg.py --target local [--apply] [--apps Training ...]

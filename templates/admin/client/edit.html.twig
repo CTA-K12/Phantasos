@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit {{ client.name }} — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{{ path('admin_client_index') }}">Clients &amp; Keys</a></li>
+    <li><a href="{{ path('admin_client_view', {id: client.id}) }}">{{ client.name }}</a></li>
+    <li>Edit</li>
+{% endblock %}
+
+{% block body %}
+<article style="max-width: 44rem;">
+    <header><strong>Edit {{ client.name }}</strong></header>
+    {{ include('admin/client/_form.html.twig', {cancel_url: path('admin_client_view', {id: client.id}), submit_label: 'Save'}) }}
+</article>
+{% endblock %}

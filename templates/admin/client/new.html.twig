@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New Client — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{{ path('admin_client_index') }}">Clients &amp; Keys</a></li>
+    <li>New</li>
+{% endblock %}
+
+{% block body %}
+<article style="max-width: 44rem;">
+    <header><strong>New API client</strong></header>
+    <p class="muted">A key is generated when you save. It is shown once, on the next page, and cannot be retrieved later — only replaced.</p>
+    {{ include('admin/client/_form.html.twig', {cancel_url: path('admin_client_index'), submit_label: 'Create client and key'}) }}
+</article>
+{% endblock %}

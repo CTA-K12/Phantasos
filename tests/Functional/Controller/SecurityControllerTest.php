@@ -14,7 +14,7 @@ class SecurityControllerTest extends WebTestCase
         $client->request('GET', '/login');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('.pp-login-logo-name', 'CTA App');
+        $this->assertSelectorTextContains('.pp-login-logo-name', 'Phantasos');
     }
 
     public function testUnauthenticatedUserRedirectsToLogin(): void
@@ -31,7 +31,7 @@ class SecurityControllerTest extends WebTestCase
         $client->request('GET', '/pending-approval');
 
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorTextContains('h3', 'Account Pending Approval');
+        $this->assertSelectorTextContains('h3', 'Account pending approval');
     }
 
     public function testAuthenticatedActiveUserCanAccessDashboard(): void

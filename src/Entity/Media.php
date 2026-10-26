@@ -71,7 +71,7 @@ class Media
 
     /** @var Collection<int, MediaFile> */
     #[ORM\OneToMany(targetEntity: MediaFile::class, mappedBy: 'media', cascade: ['persist'], orphanRemoval: true)]
-    #[ORM\OrderBy(['position' => 'ASC'])]
+    #[ORM\OrderBy(['position' => \SortDirection::Ascending])]
     private Collection $files;
 
     public function __construct(ApiClient $client, \DateTimeImmutable $uploadExpiration, ?string $id = null)
