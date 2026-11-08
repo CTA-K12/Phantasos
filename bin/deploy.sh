@@ -97,6 +97,11 @@ remote 'set -e
   for k in APP_SECRET DATABASE_URL GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET; do
     grep -q "^$k=." /etc/phantasos/phantasos.env || { echo "phantasos.env: $k is not set"; exit 1; }
   done
+  # Podman env files keep quotes and trailing comments as part of the value.
+  bad=$(grep -nP "^[A-Z_]+=[\"\x27]|^[A-Z_]+=[^#]*\s#" /etc/phantasos/phantasos.env | cut -d= -f1)
+  if [ -n "$bad" ]; then
+    echo "$bad"; echo "phantasos.env: the keys above have quotes or a trailing comment (Podman keeps both in the value)"; exit 1
+  fi
   test -f /etc/phantasos/tls/fullchain.pem && test -f /etc/phantasos/tls/privkey.pem || { echo "missing TLS files"; exit 1; }
   mountpoint -q /media || { echo "/media is not mounted"; exit 1; }
   [ "$(stat -c %u:%g /media/phantasos)" = 65534:65534 ] || { echo "/media/phantasos must be owned by 65534:65534"; exit 1; }

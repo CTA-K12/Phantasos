@@ -99,6 +99,10 @@ hold student health information (DocGuard now, ORMed later).
 `/etc/phantasos/phantasos.env`, `root:root`, mode `0600`. It is read by Podman and not mounted
 into the containers. Template: `deploy/phantasos.env.example`.
 
+**Format: Podman env file, not shell.** Podman keeps quotes and trailing `# comments` as part of the
+value, so write `KEY=value` with no quotes, and put comments on their own lines. A quoted
+`DATABASE_URL` fails to connect. `bin/deploy.sh` refuses to deploy if any line has either.
+
 | Variable | Value |
 |---|---|
 | `APP_SECRET` | new: `openssl rand -hex 32` |
