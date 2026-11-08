@@ -73,7 +73,7 @@
                             <td>
                                 {% if bytes is not null %}
                                     <div class="icon-btn-group">
-                                        {% if viewable %}{{ macros.iconBtn('view', 'Open', path('admin_media_file', {id: media.id, fileId: f.id})) }}{% endif %}
+                                        {% if viewable %}{{ macros.iconBtn('view', 'Open in a new tab', path('admin_media_file', {id: media.id, fileId: f.id}), true) }}{% endif %}
                                         {{ macros.iconBtn('download', 'Download', path('admin_media_file', {id: media.id, fileId: f.id, download: 1})) }}
                                     </div>
                                 {% endif %}

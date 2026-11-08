@@ -113,6 +113,8 @@ class MediaControllerTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         self::assertSelectorTextContains('table', 'original.pdf');
+        // Viewable files (the PDF) open in a new tab; others (the HTML) are download-only.
+        self::assertSelectorCount(1, 'a[aria-label="Open in a new tab"][target="_blank"][rel="noopener noreferrer"]');
         self::assertTrue($this->browser->getResponse()->headers->hasCacheControlDirective('no-store'));
         $log = $this->em->getRepository(AuditLog::class)->findOneBy(['action' => 'media.admin_viewed']);
         self::assertInstanceOf(AuditLog::class, $log);

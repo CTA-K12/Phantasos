@@ -71,8 +71,9 @@
 {% endmacro %}
 
 {# Round icon button for grid action columns; tooltip via Pico's data-tooltip. #}
-{% macro iconBtn(icon, label, href) %}
+{% macro iconBtn(icon, label, href, newTab = false) %}
     <a href="{{ href }}"
+       {% if newTab %}target="_blank" rel="noopener noreferrer"{% endif %}
        class="icon-btn"
        data-tooltip="{{ label }}"
        aria-label="{{ label }}">

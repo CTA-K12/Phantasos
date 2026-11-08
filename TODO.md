@@ -116,6 +116,11 @@ Runbook: **`deploy/CUTOVER.md`**. `migration/verify_media_copy.py` checks every 
 - [ ] Lower DNS TTLs ≥ 24 h ahead: public Route53 (3600) **and** internal MESD DNS `dns1i/dns2i` (86400).
 
 Test on `phantasos.apps.cascadetech.org` (test writes are disposable), then cutover:
+- [x] v1.0.1 deployed 2026-11-07 (`bin/deploy.sh --load`). TLS for both names, admin allowlist enforced
+      (403 from outside), port 80 closed. Parity vs legacy with real keys: mediaInfo 149/150 identical
+      (the 1 diff is a PDF uploaded after the 2026-10-25 rehearsal import), downloads 50/50 identical.
+- [ ] Management-site Google sign-in on the new host (each admin).
+- [ ] Consumer-team tests on the test name (upload + playback each; SubDocs callback).
 - [ ] Stop the old web server.
 - [ ] Final push sync with `--delete` (cluster side) + `import_to_pg.py --target prod --apply` (full re-import).
 - [ ] DNS flip `phantasos.mesd.k12.or.us` → .21 in both Route53 and the internal MESD DNS.
@@ -131,6 +136,9 @@ Test on `phantasos.apps.cascadetech.org` (test writes are disposable), then cuto
 - [ ] Availability: tested restore; risk assessment sign-off.
 
 ## Backlog / nice-to-have
+- [ ] (Deferred 2026-11-07, out of scope) Admin search beyond IDs: legacy stored no original filenames and no app
+      sends tags, so only filters (type/status/date/size) or app-supplied reference tags are possible. Full-text
+      PDF search would index DocGuard ePHI: needs HIPAA review first.
 - [ ] Phase 2: signed short-lived URLs (nginx `secure_link`) so browsers don't carry API keys.
 - [ ] Phase 2: HLS adaptive ladder for video.
 - [ ] One key per consumer environment (prod/demo/qa/dev currently share keys).
