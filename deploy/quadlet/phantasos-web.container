@@ -16,7 +16,7 @@ After=phantasos-app.service
 
 [Container]
 ContainerName=phantasos-web
-Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-web:TAG
+Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-web:v1.0.0
 Network=phantasos.network
 PublishPort=443:8443
 # Read-only: nginx only reads files PHP has authorised via X-Accel-Redirect.

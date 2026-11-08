@@ -6,7 +6,16 @@
 #   docker compose -f deploy/compose.yaml up -d
 name: phantasos
 
+# Same restrictions as the Quadlet units (DropCapability=ALL, NoNewPrivileges), plus low ports
+# privileged as on the host, so local runs fail the same way production would.
+x-hardening: &hardening
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  sysctls:
+    net.ipv4.ip_unprivileged_port_start: 1024
+
 x-app: &app
+  <<: *hardening
   image: ${PHANTASOS_APP_IMAGE:-phantasos-app:local}
   env_file: ${PHANTASOS_ENV_FILE:?set PHANTASOS_ENV_FILE}
   volumes:
@@ -23,6 +32,7 @@ services:
     command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600", "--memory-limit=768M", "-vv"]
 
   phantasos-web:
+    <<: *hardening
     image: ${PHANTASOS_WEB_IMAGE:-phantasos-web:local}
     depends_on: [phantasos-app]
     ports:

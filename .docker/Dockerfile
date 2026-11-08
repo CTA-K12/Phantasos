@@ -61,7 +61,11 @@ CMD ["php-fpm84", "-F"]
 # ── web: nginx ───────────────────────────────────────────────────────────────
 FROM alpine:3 AS web
 
+# Remove the package's default server: it listens on port 80, which a non-root nginx with all
+# capabilities dropped (the Quadlet unit) cannot bind. Docker hides this locally because it allows
+# unprivileged binds to low ports by default.
 RUN apk add --no-cache nginx \
+ && rm -f /etc/nginx/http.d/default.conf \
  && mkdir -p /run/nginx /var/lib/nginx/tmp \
  && chown -R nginx:nginx /run/nginx /var/lib/nginx /var/log/nginx \
  && ln -sf /dev/stdout /var/log/nginx/access.log \

@@ -8,7 +8,7 @@ Wants=network-online.target
 
 [Container]
 ContainerName=phantasos-worker
-Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-app:TAG
+Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-app:v1.0.0
 Network=phantasos.network
 EnvironmentFile=/etc/phantasos/phantasos.env
 Volume=/media:/media
