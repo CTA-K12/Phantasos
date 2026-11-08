@@ -5,6 +5,8 @@ namespace App\Repository;
 use App\Entity\ApiClient;
 use App\Entity\Media;
 use App\Enum\MediaStatus;
+use App\Search\MediaSearch;
+use Doctrine\ORM\Tools\Pagination\Paginator;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -123,6 +125,42 @@ class MediaRepository extends ServiceEntityRepository
         }
         /** @var list<Media> */
         return $qb->getQuery()->getResult();
+    }
+
+    /** @return Paginator<Media> newest first */
+    public function search(MediaSearch $search): Paginator
+    {
+        $qb = $this->createQueryBuilder('m')
+            ->addSelect('c')->join('m.client', 'c')
+            ->orderBy('m.createdAt', 'DESC')->addOrderBy('m.id', 'DESC')
+            ->setFirstResult(($search->page - 1) * MediaSearch::PER_PAGE)
+            ->setMaxResults(MediaSearch::PER_PAGE);
+
+        if ($search->clientId !== null) {
+            $qb->andWhere('c.id = :client')->setParameter('client', $search->clientId, 'uuid');
+        }
+        if ($search->id !== '') {
+            // A media ID or one of its file IDs; partial input matches as a prefix.
+            $qb->andWhere('m.id LIKE :id OR EXISTS (SELECT 1 FROM App\Entity\MediaFile f WHERE f.media = m AND f.id LIKE :id)')
+                ->setParameter('id', $search->id . '%');
+        }
+        if ($search->type !== null) {
+            $qb->andWhere('m.mediaType = :type')->setParameter('type', $search->type);
+        }
+        if ($search->status !== null) {
+            $qb->andWhere('m.status = :status')->setParameter('status', $search->status);
+        }
+        if (!$search->tickets) {
+            $qb->andWhere('m.uploaded = true');
+        }
+        if ($search->from !== null) {
+            $qb->andWhere('m.createdAt >= :from')->setParameter('from', $search->from);
+        }
+        if ($search->to !== null) {
+            $qb->andWhere('m.createdAt < :to')->setParameter('to', $search->to->modify('+1 day'));
+        }
+
+        return new Paginator($qb->getQuery(), fetchJoinCollection: false);
     }
 
     public function flush(): void

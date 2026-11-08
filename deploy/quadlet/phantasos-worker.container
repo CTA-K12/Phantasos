@@ -1,5 +1,6 @@
 # Messenger worker: runs the image/audio/video processors (ffmpeg) and callbacks.
 # Exits hourly (--time-limit) and systemd restarts it, releasing memory.
+# Mount ordering and the registry auth file come from the host drop-in (10-host.conf).
 [Unit]
 Description=Phantasos media processing worker
 After=network-online.target

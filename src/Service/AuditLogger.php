@@ -25,6 +25,8 @@ class AuditLogger
         'media.served'            => 'Media File Served',
         'media.uploaded'          => 'Media Uploaded',
         'media.reprocessed'       => 'Media Reprocessed',
+        'media.admin_viewed'      => 'Media Viewed (admin)',
+        'media.admin_file_opened' => 'Media File Opened (admin)',
         'client.created'          => 'API Client Created',
         'client.updated'          => 'API Client Updated',
         'client.key_rotated'      => 'API Key Rotated',

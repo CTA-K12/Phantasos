@@ -23,7 +23,7 @@
                                 'It goes back on the queue and the worker processes the original again.', 'Retry', 'success') }}
                         </td>
                     {% endif %}
-                    <td class="mono">{{ m.id }}</td>
+                    <td class="mono">{% if is_granted('ROLE_ADMIN') %}<a href="{{ path('admin_media_view', {id: m.id}) }}">{{ m.id }}</a>{% else %}{{ m.id }}{% endif %}</td>
                     {% if show_client %}<td>{{ m.client.name }}</td>{% endif %}
                     <td>{{ m.mediaType ? m.mediaType.value : '—' }}</td>
                     <td>

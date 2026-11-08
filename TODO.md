@@ -78,30 +78,47 @@ Open:
 - [x] Word/Excel: not supported (decided 2026-10-25). Revisit with ORMed (docx/xlsx attachments).
 - [x] Management UI (2026-10-25): ORMed v2 layout + help panel; Clients & Keys (create/rotate/
       deactivate, key shown once); Processing (failed/stuck + retry); dashboard; nginx allowlist.
-- [ ] Media browser (search by client/media ID, view files; audit each view).
+- [x] Media browser + dashboard charts (2026-10-25).
 - [ ] Phantasos Google OAuth client for the management site; add the real admin users.
-- [?] Management-site allowlist: confirm which source ranges staff arrive from at .21 (private
-      ranges are the default; if traffic is NATed to MESD/NWRESD public IPs, list those).
-- [ ] Build/push script for Harbor (`appdev-phi`), image tags; Trivy scan clean.
+- [x] Management-site allowlist = cluster admin-tier ranges (2026-10-25). Verify from the VPN
+      once .21 is serving (sessions should arrive as 10.0.207.x / 10.0.242.x, not NATed).
+- [x] `bin/deploy.sh`: build, ship (Harbor, or `--load` over SSH), install units, restart, migrate, smoke test; `--rollback`.
+- [ ] Trivy scan clean (Harbor scans on push).
 - [ ] Retention for `audit_log` (`media.served` ≈ 7k rows/day) and `messenger_messages` failed queue.
 - [ ] Monitoring: worker liveness, failed-message count, disk usage on /media.
 
 ## Host & cutover (phantasos.apps.cascadetech.org, .21)
 
-Handoff to the cluster/infra side (details in AI.md §14 "Host prerequisites"):
-- [ ] LUKS on `/media` (while empty); SELinux fcontext for `/media` (no `:Z`).
-- [ ] Podman + Quadlet; Harbor robot login.
-- [ ] Let's Encrypt (Route53 DNS-01) for both names → `/etc/phantasos/tls/`; renewal reload hook.
-      Confirm Route53 hosts `mesd.k12.or.us`.
-- [ ] `/etc/phantasos/phantasos.env` (mode 600) from `deploy/phantasos.env.example`; fresh APP_SECRET.
-- [ ] Firewall: 443/80 public; pg access from .21 to appdev-pg-prod.
-- [ ] Remove MongoDB from the cluster repo's Phase 17.
-- [ ] rsync old→new `/media/phantasos` (`--chown=65534:65534`), nightly `/media` backup.
+Handoff to the cluster/infra side: **`deploy/HOST-SETUP.md`** (given 2026-10-25; host built
+2026-11-07 in the k8s-cluster repo, `docs/07`, role `phantasos_host`):
+- [x] LUKS on `/media` (`luks-unlock-media.service`); SELinux fcontext for `/media` and `/etc/phantasos/tls` (no `:Z`).
+- [x] Let's Encrypt for both names → `/etc/phantasos/tls/`; renewal hook reloads `phantasos-web`.
+- [x] Host drop-in `10-host.conf` on all three units (mount ordering, registry auth file).
+- [x] Firewall 443 only; port 80 dropped from the web unit (no plain-HTTP API use in old logs, 2026-10-04..11-07).
+- [x] Front door: direct public 443 on .21 (decided 2026-10-25); Envoy forwarder possibly later (AI.md §14).
+- [x] MongoDB removed from the cluster repo's Phase 17.
+- [ ] **Network-team ACL .21 → Harbor .6:443** (requested 2026-10-27, followed up 2026-11-07). Blocks the
+      Harbor robot login (`/etc/containers/auth.json`) and the first deploy.
+- [ ] Network-team ACL: inbound 443 from the internet to .21.
+- [ ] `/etc/phantasos/phantasos.env` (mode 600), placed by hand from `deploy/phantasos.env.example`; fresh APP_SECRET.
+- [ ] Production Google OAuth redirect URIs for both hosts.
+- [x] DB connectivity verified 2026-11-07: from .21 (TLS 1.3, cert verified, `pg_hba` allows .21, SCRAM login) and from the
+      app image (PHP 8.4 / Alpine libpq, `sslmode=verify-full&sslrootcert=system`).
+- [ ] Confirm the 10.0.207.0/24 VPN pool really is a /24 (wider → intermittent 403s).
+- [x] Initial media copy 2026-11-07 (pushed, 33 min): 43,357 files / 120,229,432,452 bytes on both ends; every DB
+      file row present with matching size, 65534:65534, 644/755 (`verify_media_copy.py`). 7 extras: 3 legacy
+      backup .mp4s (2023, unreferenced) + 4 PDFs uploaded after the 2026-10-25 rehearsal import.
+- [ ] `/media` backups + auditd (cluster side); final media sync at cutover: **pushed from the old server by the
+      cluster side** (initial pass, then final `--delete` sync at cutover); file counts from both ends.
+- [ ] Monitoring targets and alerts (HOST-SETUP.md §8).
+
+Runbook: **`deploy/CUTOVER.md`**. `migration/verify_media_copy.py` checks every DB file row against the copy.
+- [ ] Lower DNS TTLs ≥ 24 h ahead: public Route53 (3600) **and** internal MESD DNS `dns1i/dns2i` (86400).
 
 Test on `phantasos.apps.cascadetech.org` (test writes are disposable), then cutover:
 - [ ] Stop the old web server.
-- [ ] Final `rsync --delete` + `import_to_pg.py --target prod --apply` (full re-import).
-- [ ] DNS flip `phantasos.mesd.k12.or.us` → .21.
+- [ ] Final push sync with `--delete` (cluster side) + `import_to_pg.py --target prod --apply` (full re-import).
+- [ ] DNS flip `phantasos.mesd.k12.or.us` → .21 in both Route53 and the internal MESD DNS.
 - [ ] Monitor 1 h: consumer traffic (Training, HealthEd MESD/NWRESD, SubDocs, DocGuard when on),
       worker queue, callbacks to SubDocs.
 - [ ] Decommission old host, MD3200i, appdev-video1/2/3; remove RabbitMQ.

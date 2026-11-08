@@ -3,10 +3,23 @@
 {% block title %}Dashboard — {{ app_name }}{% endblock %}
 {% block breadcrumbs %}<li>Dashboard</li>{% endblock %}
 
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('js/apexcharts3.54.0.min.js') }}"></script>
+{% endblock %}
+
 {% block body %}
 <div class="stat-row">
     <article><span class="stat-value">{{ activeClients }}</span><span class="stat-label">active clients</span></article>
     <article><span class="stat-value">{{ totalMedia|number_format }}</span><span class="stat-label">media stored</span></article>
+    <article>
+        {% if storage %}
+            <span class="stat-value">{{ (storage.used / 1073741824)|number_format(0) }} <small>GB</small></span>
+            <span class="stat-label">of {{ (storage.total / 1073741824)|number_format(0) }} GB used ({{ storage.percent }}%)</span>
+        {% else %}
+            <span class="stat-value">—</span><span class="stat-label">storage (media volume not mounted)</span>
+        {% endif %}
+    </article>
     <article><span class="stat-value">{{ uploadsWeek|number_format }}</span><span class="stat-label">uploads, last 7 days</span></article>
     <article><span class="stat-value">{{ servedWeek|number_format }}</span><span class="stat-label">files served, last 7 days</span></article>
     <article><span class="stat-value">{{ queue.waiting + queue.running }}</span><span class="stat-label">in processing queue</span></article>
@@ -18,8 +31,89 @@
     </article>
 </div>
 
+<div class="row">
+    <div class="col-xs-12 col-lg-8">
+        <article style="height: calc(100% - var(--pico-block-spacing-vertical));">
+            <header><strong>Uploads per day</strong> <small class="muted">last 30 days, by client</small></header>
+            {% if uploadsPerDay.series is empty %}
+                <p class="muted">No uploads in the last 30 days.</p>
+            {% else %}
+                <div id="chart-uploads"></div>
+            {% endif %}
+        </article>
+    </div>
+    <div class="col-xs-12 col-lg-4">
+        <article style="height: calc(100% - var(--pico-block-spacing-vertical));">
+            <header><strong>Files served</strong> <small class="muted">last 30 days, by client</small></header>
+            {% if downloads is empty %}
+                <p class="muted">No downloads recorded in the last 30 days.</p>
+            {% else %}
+                <div id="chart-downloads"></div>
+            {% endif %}
+        </article>
+    </div>
+</div>
+
 <article>
     <header><strong>Recent uploads</strong></header>
     {{ include('admin/_media_table.html.twig', {media: recent, show_client: true}) }}
 </article>
+
+<script>
+(function () {
+    'use strict';
+    if (!window.ApexCharts) return;
+
+    var uploads   = {{ uploadsPerDay|json_encode|raw }};
+    var downloads = {{ downloads|json_encode|raw }};
+    var palette   = ['#0172ad', '#06b6d4', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#64748b']; // ORMed v2's chart colours
+    var charts    = [];
+
+    function fore() {
+        return getComputedStyle(document.documentElement).getPropertyValue('--pico-color').trim() || '#555';
+    }
+    // Team convention: no ApexCharts hover/active dimming, legend on top.
+    var common = {
+        colors: palette,
+        dataLabels: { enabled: false },
+        legend: { position: 'top' },
+        states: { hover: { filter: { type: 'none' } }, active: { filter: { type: 'none' } } },
+        grid: { borderColor: 'rgba(128,128,128,0.2)' },
+        tooltip: { theme: document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light' },
+    };
+
+    var up = document.getElementById('chart-uploads');
+    if (up) {
+        charts.push(new ApexCharts(up, Object.assign({}, common, {
+            chart: { type: 'bar', stacked: true, height: 300, toolbar: { show: false }, foreColor: fore(), background: 'transparent' },
+            series: uploads.series,
+            xaxis: { categories: uploads.days.map(function (d) { return d.slice(5); }), tickAmount: 10, labels: { rotate: 0, hideOverlappingLabels: true } },
+            yaxis: { labels: { formatter: function (v) { return Math.round(v); } } },
+            plotOptions: { bar: { borderRadius: 4, columnWidth: '70%' } },
+        })));
+    }
+
+    var dl = document.getElementById('chart-downloads');
+    if (dl) {
+        charts.push(new ApexCharts(dl, Object.assign({}, common, {
+            chart: { type: 'bar', height: 300, toolbar: { show: false }, foreColor: fore(), background: 'transparent' },
+            series: [{ name: 'Files served', data: downloads.map(function (r) { return r.n; }) }],
+            xaxis: { categories: downloads.map(function (r) { return r.client; }) },
+            plotOptions: { bar: { borderRadius: 4, horizontal: true, distributed: true, barHeight: '60%' } },
+            legend: { show: false },
+        })));
+    }
+
+    charts.forEach(function (c) { c.render(); });
+
+    // Follow the theme toggle.
+    document.addEventListener('themeChange', function (ev) {
+        setTimeout(function () {
+            charts.forEach(function (c) {
+                c.updateOptions({ chart: { foreColor: fore() }, tooltip: { theme: ev.detail === 'dark' ? 'dark' : 'light' } });
+            });
+        }, 0);
+    });
+})();
+</script>
 {% endblock %}

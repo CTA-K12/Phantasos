@@ -1,0 +1,76 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}Media — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}<li>Media</li>{% endblock %}
+
+{% block body %}
+<article>
+    <form method="GET" action="{{ path('admin_media_index') }}"
+          style="display: flex; gap: 0.75rem; align-items: flex-end; flex-wrap: wrap;">
+        <label style="margin: 0; flex: 1 1 16rem;">Media or file ID
+            <input type="search" name="id" value="{{ search.id }}" placeholder="full ID or the first characters"
+                   autocomplete="off" spellcheck="false" class="mono" style="margin: 0;">
+        </label>
+        <label style="margin: 0;">Client
+            <select name="client" style="margin: 0;">
+                <option value="">All clients</option>
+                {% for c in clients %}
+                    <option value="{{ c.id }}" {{ search.clientId and search.clientId.equals(c.id) ? 'selected' }}>{{ c.name }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label style="margin: 0;">Type
+            <select name="type" style="margin: 0;">
+                <option value="">Any</option>
+                {% for t in types %}<option value="{{ t.value }}" {{ search.type == t ? 'selected' }}>{{ t.value }}</option>{% endfor %}
+            </select>
+        </label>
+        <label style="margin: 0;">Status
+            <select name="status" style="margin: 0;">
+                <option value="">Any</option>
+                {% for s in statuses %}<option value="{{ s.value }}" {{ search.status == s ? 'selected' }}>{{ s.value }}</option>{% endfor %}
+            </select>
+        </label>
+        <label style="margin: 0;">From <input type="date" name="from" value="{{ search.from ? search.from|date('Y-m-d') }}" style="margin: 0;"></label>
+        <label style="margin: 0;">To <input type="date" name="to" value="{{ search.to ? search.to|date('Y-m-d') }}" style="margin: 0;"></label>
+        <label style="margin: 0 0 0.6rem;" data-tooltip="Upload tickets that never received a file">
+            <input type="checkbox" name="tickets" value="1" role="switch" {{ search.tickets ? 'checked' }}> Unused tickets
+        </label>
+        <button type="submit" style="width: auto; margin: 0;">Search</button>
+        <a role="button" class="secondary outline" href="{{ path('admin_media_index') }}" style="margin: 0;">Clear</a>
+    </form>
+
+    <figure>
+        <table role="grid">
+            <thead>
+                <tr><th>Media ID</th><th>Client</th><th>Type</th><th>Status</th><th>Created</th><th>Files</th></tr>
+            </thead>
+            <tbody>
+                {% for m in results %}
+                    <tr>
+                        <td><a class="mono" href="{{ path('admin_media_view', {id: m.id}) }}">{{ m.id }}</a></td>
+                        <td>{{ m.client.name }}</td>
+                        <td>{{ m.mediaType ? m.mediaType.value : '—' }}</td>
+                        <td>{{ include('admin/media/_status.html.twig', {m: m}) }}</td>
+                        <td>{{ m.createdAt|date('M j, Y g:ia') }}</td>
+                        <td>{{ m.files|length }}</td>
+                    </tr>
+                {% else %}
+                    <tr><td colspan="6"><em>No media match.</em></td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </figure>
+
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <small class="muted">{{ total|number_format }} {{ total == 1 ? 'item' : 'items' }}{% if totalPages > 1 %} · page {{ search.page }} of {{ totalPages|number_format }}{% endif %}</small>
+        {% if totalPages > 1 %}
+            <div style="display: flex; gap: 0.25rem;">
+                {% if search.page > 1 %}<a role="button" class="secondary outline" href="{{ path('admin_media_index', search.toQuery|merge({page: search.page - 1})) }}">‹ Newer</a>{% endif %}
+                {% if search.page < totalPages %}<a role="button" class="secondary outline" href="{{ path('admin_media_index', search.toQuery|merge({page: search.page + 1})) }}">Older ›</a>{% endif %}
+            </div>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

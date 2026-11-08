@@ -1,0 +1,7 @@
+{% set st = m.status.value %}
+{% if not m.uploaded %}
+    <span class="pill pill--off">Unused ticket</span>
+{% else %}
+    <span class="pill {{ st == 'Ready' ? 'pill--ok' : (st == 'Failed to process' ? 'pill--bad' : 'pill--warn') }}">{{ st }}</span>
+    {% if st == 'Processing' %}<small class="muted">{{ m.processingPercentage }}%</small>{% endif %}
+{% endif %}

@@ -433,7 +433,7 @@ Alpine containers following the team pattern (`alpine:3` + `php84` packages, non
 (Trivy). Differences from the team pattern for an ePHI service: Composer is fetched with TLS verification,
 and secrets are injected at runtime (not baked into the image via `.env`). As built: see §14.
 
-**Network/TLS:** public 443 directly on .21; Let's Encrypt via Route53 DNS-01 with one cert for **both**
+**Network/TLS:** public 443 directly on .21 (443 only, no port 80: see §14); Let's Encrypt via Route53 DNS-01 with one cert for **both**
 `phantasos.apps.cascadetech.org` (testing) and `phantasos.mesd.k12.or.us` (after the DNS flip). TBC that
 Route53 hosts the `mesd.k12.or.us` zone. Envoy/WAF is a later option (exempt the large upload/download
 bodies). Admin UI is reachable from internal networks only; nginx exposes `/api` publicly, with limits.
@@ -488,10 +488,33 @@ State of the `php8_upgrade` working tree. Everything below is implemented and te
 - Processing: failed media and "stuck" media (uploaded, still queued/processing after 6 h) with
   retry and retry-all (`media.reprocessed`). Replaces the legacy `reprocess` command. Messenger's
   failure transport was dropped: the media row's "Failed to process" status is the record.
-- Dashboard: active clients, media stored, uploads and files served in the last 7 days, queue
-  depth, failed/stuck count, recent uploads.
+- Dashboard: active clients, media stored, `/media` volume usage, uploads and files served in the
+  last 7 days, queue depth, failed/stuck count, uploads per day by client and files served by
+  client (30 days, ApexCharts), recent uploads.
+- Media browser: search by media or file ID (prefix), client, type, status, date, with unused
+  tickets optional. The detail page shows files in mediaInfo order, with size and on-disk status,
+  callback status and retry. Opening an item or a file is audited (`media.admin_viewed`,
+  `media.admin_file_opened`). Files are served via X-Accel with `no-store`. Only images, video,
+  audio and PDF display inline; anything else downloads. Inline files other than PDFs get
+  `CSP: sandbox`.
 - nginx serves `/api/` publicly; everything else (sign-in, admin, static files) only to the
-  ranges in `/etc/nginx/admin-access.conf` (default: private ranges; override by mounting).
+  admin-tier ranges in `/etc/nginx/admin-access.conf`: MESD and NWRESD sysadmin, the CTA VPN and the CTA MESD Outside VPN. The Support-team VPN and the server subnets are excluded. Override by mounting a replacement file.
+- **Host (built 2026-11-07, k8s-cluster repo `docs/07`, role `phantasos_host`):** LUKS `/media`
+  unlocked by `luks-unlock-media.service`; a host drop-in `10-host.conf` on all three units supplies
+  `RequiresMountsFor=/media`, the LUKS ordering and `REGISTRY_AUTH_FILE`. The certbot hook reloads
+  the container named `phantasos-web`. The media copy is pushed from the old server by the cluster
+  side, not pulled from .21.
+- **Port 80 is not published (2026-11-07).** The host firewall allows 443 only, and podman-published
+  ports can bypass firewalld. The old server's port-80 logs (2026-10-04 to 2026-11-07) held no API
+  calls, only scanners. nginx still listens on 8080 in the container (used by `deploy/compose.yaml`).
+- **Front door (decided 2026-10-25): direct public 443 on .21**, not the cluster's Envoy forwarder.
+  nginx sees real client IPs, so its allowlist is effective. If Phantasos later moves behind Envoy:
+  - Put the allowlist in an Envoy SecurityPolicy, and limit nginx's non-API paths to the worker
+    subnet. Do **not** trust X-Forwarded-For from 198.236.76.0/28: pods egress through the same
+    worker IPs and could spoof it.
+  - Raise Envoy's body-size and timeout limits for `/api/uploadMedia/` (1 GB) and for
+    `/api/requestMedia` (large downloads, Range).
+  - Move the certificate to Envoy.
 
 **appdev-pg-prod contents (2026-10-25):** real data only, no fixtures. The 5 clients, 39,486
 media and 43,350 files come from the import. The four CTA admins (`dcramble`, `thand`, `staylor`, `jdhruv`

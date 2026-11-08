@@ -14,6 +14,7 @@
             {% if is_granted('ROLE_ADMIN') %}
                 {% set nav = nav|merge([
                     { route: 'admin_client_index',     stems: ['admin_client'],     icon: 'key',        label: 'Clients & Keys' },
+                    { route: 'admin_media_index',      stems: ['admin_media'],      icon: 'file',       label: 'Media' },
                     { route: 'admin_processing_index', stems: ['admin_processing'], icon: 'warning',    label: 'Processing', badge: processing_problem_count() },
                     { route: 'admin_user_index',       stems: ['admin_user'],       icon: 'users',      label: 'Users' },
                     { route: 'admin_audit_index',      stems: ['admin_audit'],      icon: 'log',        label: 'Audit Log' },

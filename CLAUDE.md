@@ -53,13 +53,13 @@ src/Service/MediaInfoPresenter.php     legacy mediaInfo JSON shape
 src/Service/MediaFileResponder.php     X-Accel-Redirect (prod) / BinaryFileResponse (dev, tests)
 src/Processor/                         Image, Pdf, Audio, Video (tag app.processor)
 src/MessageHandler/ProcessMediaHandler.php   the worker
-src/Controller/Admin/                  Clients & Keys, Processing (retry), Users, Audit Log (ROLE_ADMIN)
+src/Controller/Admin/                  Clients & Keys, Media browser, Processing (retry), Users, Audit Log (ROLE_ADMIN)
 templates/base.html.twig               signed-in shell (sidebar, breadcrumbs, help panel, confirm modal)
 templates/public.html.twig             pre-sign-in shell; macros.html.twig = icons, iconBtn, confirmAction
 migration/                             Python tooling (own venv at .venv): legacy inspection/purge,
                                        capture_contract.py, import_to_pg.py, parity_check.py
 tests/Contract/                        legacy contract replay (fixtures/legacy/*.json)
-deploy/                                Quadlet units, compose file, runtime env template
+deploy/                                Quadlet units, compose file, env template, HOST-SETUP.md, CUTOVER.md
 ```
 
 ## Adding a processor
@@ -78,6 +78,10 @@ position 0), and drive `ProgressReporter` phases. The handler sets Ready/100 and
   Row actions: `macros.iconBtn(...)`. Every POST action goes through `macros.confirmAction` /
   `confirmActionButton` (shared modal, CSRF token, optional reason) — never `window.confirm`.
 - Flash types: `success`, `warning`, `error`, `info`.
+- Charts: ApexCharts 3.54 (`public/js`, loaded per page via `{% block javascripts %}`), configured like
+  ORMed's (palette, toolbar off, no data labels, rounded bars), plus no hover dimming and legend on top.
+- Media can hold ePHI: any admin screen that shows a media item or serves its files must audit it
+  (`media.admin_viewed`, `media.admin_file_opened`) and send `Cache-Control: no-store`.
 - Help: `docs/help/<route_name>.md`, shown in the slide-out panel (`?` in the top bar).
 - **API keys are displayed once**, in the response to the create/rotate POST (`Cache-Control:
   no-store`), never via flash/session, and never logged — audit metadata holds names only.
@@ -107,6 +111,10 @@ php bin/console app:user:create someone@mesd.k12.or.us --role=ROLE_ADMIN   # boo
 
 # Legacy → PG import (dry run unless --apply). Target prod reads migration/secrets/new-pg.env.
 cd migration && ../.venv/bin/python import_to_pg.py --target local [--apply] [--apps Training ...]
+
+# Deploy to .21 (prompts; --load ships images over SSH instead of Harbor; --dry-run; --rollback X.Y.Z)
+bin/deploy.sh
+cd migration && ../.venv/bin/python verify_media_copy.py   # DB file rows vs the copy on .21 (and old sizes)
 
 # Images (linux/amd64 for the server)
 docker build --platform linux/amd64 -f .docker/Dockerfile --target app -t phantasos-app:local .

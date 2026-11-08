@@ -2,6 +2,7 @@
 #
 # Install: copy deploy/quadlet/* to /etc/containers/systemd/, set the image tag,
 # then `systemctl daemon-reload && systemctl start phantasos-web` (pulls the others in).
+# Mount ordering and the registry auth file come from the host drop-in (10-host.conf).
 [Unit]
 Description=Phantasos PHP-FPM
 After=network-online.target

@@ -66,4 +66,11 @@ class MediaStorage
 
         return $file;
     }
+
+    /** Size in bytes, or null when the file is not on disk (e.g. before the rsync). */
+    public function fileSize(MediaFile $file): ?int
+    {
+        $path = $this->absolutePath($file);
+        return is_file($path) ? (int) filesize($path) : null;
+    }
 }

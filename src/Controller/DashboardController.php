@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Repository\ApiClientRepository;
 use App\Repository\AuditLogRepository;
 use App\Repository\MediaRepository;
+use App\Service\DashboardStats;
 use App\Service\QueueStats;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,7 @@ class DashboardController extends AbstractController
         MediaRepository $media,
         AuditLogRepository $audit,
         QueueStats $queue,
+        DashboardStats $stats,
     ): Response {
         $weekAgo = new \DateTimeImmutable('-7 days');
 
@@ -37,6 +39,9 @@ class DashboardController extends AbstractController
             'queue'         => $queue->processing(),
             'problems'      => $media->countProblems(),
             'recent'        => $media->findRecentUploads(15),
+            'storage'       => $stats->storage(),
+            'uploadsPerDay' => $stats->uploadsPerDay(30),
+            'downloads'     => $stats->downloadsPerClient(30),
         ]);
     }
 }

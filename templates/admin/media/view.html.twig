@@ -1,0 +1,88 @@
+{% extends 'base.html.twig' %}
+{% import 'macros.html.twig' as macros %}
+
+{% block title %}{{ media.id }} — {{ app_name }}{% endblock %}
+{% block breadcrumbs %}
+    <li><a href="{{ path('admin_media_index') }}">Media</a></li>
+    <li class="mono">{{ media.id }}</li>
+{% endblock %}
+{% block breadcrumb_actions %}
+    {% if canRetry %}
+        {{ macros.confirmActionButton(path('admin_processing_retry', {id: media.id}), csrf_token('processing-retry'),
+            'Retry processing', 'Retry processing ' ~ media.id ~ '?',
+            'It goes back on the queue and the worker processes the original again.', 'Retry', 'warning', false,
+            {return_to: 'media'}) }}
+    {% endif %}
+{% endblock %}
+
+{% block body %}
+<p class="muted" style="margin-top: 1rem;"><small>{{ macros.icon('shield') }} Opening this page and each file is recorded in the audit log.</small></p>
+
+<div class="row">
+    <div class="col-xs-12 col-md-6">
+        <article>
+            <header><strong>Media</strong> {{ include('admin/media/_status.html.twig', {m: media}) }}</header>
+            <dl class="facts">
+                <dt>Media ID</dt><dd class="mono">{{ media.id }}</dd>
+                <dt>Client</dt><dd><a href="{{ path('admin_client_view', {id: media.client.id}) }}">{{ media.client.name }}</a></dd>
+                <dt>Type</dt><dd>{{ media.mediaType ? media.mediaType.value : '—' }}</dd>
+                <dt>Created</dt><dd>{{ media.createdAt|date('M j, Y g:i:sa') }}</dd>
+                <dt>Ticket expires</dt><dd>{{ media.uploadExpiration|date('M j, Y g:i:sa') }}</dd>
+                <dt>Processing</dt><dd>{{ media.processingPercentage }}%{{ media.ready ? ' · ready' : '' }}</dd>
+                <dt>Hidden from others</dt><dd>{{ macros.check(media.hideToOthers) }}</dd>
+                {% if media.tags %}<dt>Tags</dt><dd>{{ media.tags|join(', ') }}</dd>{% endif %}
+                {% if media.securityTags %}<dt>Security tags</dt><dd>{{ media.securityTags|join(', ') }}</dd>{% endif %}
+            </dl>
+        </article>
+    </div>
+    <div class="col-xs-12 col-md-6">
+        <article>
+            <header><strong>Callback</strong></header>
+            {% if media.callback %}
+                <dl class="facts">
+                    <dt>URL</dt><dd class="mono" style="word-break: break-all;">{{ media.callback }}</dd>
+                    <dt>Delivered</dt><dd>{{ macros.check(media.callbackSent) }} {{ media.callbackSent ? 'HTTP 200 received' : (media.ready ? 'not delivered' : 'sent when ready') }}</dd>
+                </dl>
+            {% else %}
+                <p class="muted">No callback requested.</p>
+            {% endif %}
+        </article>
+    </div>
+</div>
+
+<article>
+    <header><strong>Files</strong> <small class="muted">in the order mediaInfo lists them</small></header>
+    {% if media.files is empty %}
+        <p class="muted">No files — the upload ticket was never used.</p>
+    {% else %}
+        <figure>
+            <table role="grid">
+                <thead><tr><th>#</th><th>File</th><th>File ID</th><th>Type</th><th>Size</th><th>Dimensions / bitrate</th><th>On disk</th><th></th></tr></thead>
+                <tbody>
+                    {% for f in media.files %}
+                        {% set bytes = sizes[f.id] %}
+                        {% set viewable = inline|filter(p => f.contentType starts with p)|length > 0 %}
+                        <tr>
+                            <td>{{ f.position }}</td>
+                            <td>{{ f.fileName }}{% if f.original %} <span class="pill pill--off">original</span>{% endif %}</td>
+                            <td class="mono">{{ f.id }}</td>
+                            <td>{{ f.contentType }}</td>
+                            <td>{{ bytes is null ? '—' : (bytes >= 1048576 ? (bytes / 1048576)|number_format(1) ~ ' MB' : (bytes / 1024)|number_format(0) ~ ' KB') }}</td>
+                            <td>{{ f.width and f.height ? f.width ~ '×' ~ f.height : '' }}{{ f.bitRate ? ' · ' ~ f.bitRate : '' }}</td>
+                            <td>{% if bytes is null %}<span class="pill pill--bad">missing</span>{% else %}{{ macros.check(true) }}{% endif %}</td>
+                            <td>
+                                {% if bytes is not null %}
+                                    <div class="icon-btn-group">
+                                        {% if viewable %}{{ macros.iconBtn('view', 'Open', path('admin_media_file', {id: media.id, fileId: f.id})) }}{% endif %}
+                                        {{ macros.iconBtn('download', 'Download', path('admin_media_file', {id: media.id, fileId: f.id, download: 1})) }}
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </figure>
+    {% endif %}
+</article>
+{% endblock %}

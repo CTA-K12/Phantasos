@@ -60,7 +60,10 @@ class ProcessingController extends AbstractController
             $this->addFlash('error', sprintf('Media %s has no original file to process.', $id));
         }
 
-        return $this->redirectToRoute('admin_processing_index');
+        // Retry is also offered on the media browser's detail page; go back there.
+        return $request->request->getString('return_to') === 'media'
+            ? $this->redirectToRoute('admin_media_view', ['id' => $id])
+            : $this->redirectToRoute('admin_processing_index');
     }
 
     #[Route('/retry-all', name: 'admin_processing_retry_all', methods: ['POST'])]
