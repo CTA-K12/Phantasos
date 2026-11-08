@@ -58,7 +58,16 @@ management dashboard.
    cd migration && ../.venv/bin/python verify_media_copy.py --no-old    # DB vs new host
    ```
    Run it without `--no-old` after the re-import (step 4) for the full old-vs-new size check.
-4. **Final import** (full re-import of every client, one transaction each):
+4. **Final import** (full re-import of every client, one transaction each). It replaces the five
+   legacy clients' media and resets their name, key, description, contact and active flag to the
+   legacy values: test uploads, key rotations and edits made during testing are undone, which is
+   intended. It does **not** touch clients created in the admin site during testing. Their rows
+   would survive with their files gone, so delete them first (on appdev-pg-prod; media files cascade):
+   ```sql
+   DELETE FROM media      WHERE client_id IN (SELECT id FROM api_client WHERE legacy_name IS NULL);
+   DELETE FROM api_client WHERE legacy_name IS NULL;
+   ```
+   Then:
    ```
    cd migration && ../.venv/bin/python import_to_pg.py --target prod            # dry run: check counts
    cd migration && ../.venv/bin/python import_to_pg.py --target prod --apply

@@ -119,7 +119,7 @@ Test on `phantasos.apps.cascadetech.org` (test writes are disposable), then cuto
 - [x] v1.0.1 deployed 2026-11-07 (`bin/deploy.sh --load`). TLS for both names, admin allowlist enforced
       (403 from outside), port 80 closed. Parity vs legacy with real keys: mediaInfo 149/150 identical
       (the 1 diff is a PDF uploaded after the 2026-10-25 rehearsal import), downloads 50/50 identical.
-- [ ] Management-site Google sign-in on the new host (each admin).
+- [x] Management-site Google sign-in on the new host (verified 2026-11-07).
 - [ ] Consumer-team tests on the test name (upload + playback each; SubDocs callback).
 - [ ] Stop the old web server.
 - [ ] Final push sync with `--delete` (cluster side) + `import_to_pg.py --target prod --apply` (full re-import).
