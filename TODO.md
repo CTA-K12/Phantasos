@@ -97,10 +97,10 @@ Handoff to the cluster/infra side: **`deploy/HOST-SETUP.md`** (given 2026-10-25;
 - [x] Firewall 443 only; port 80 dropped from the web unit (no plain-HTTP API use in old logs, 2026-10-04..11-07).
 - [x] Front door: direct public 443 on .21 (decided 2026-10-25); Envoy forwarder possibly later (AI.md §14).
 - [x] MongoDB removed from the cluster repo's Phase 17.
-- [ ] **Network-team ACL .21 → Harbor .6:443** (requested 2026-10-27, followed up 2026-11-07). Blocks the
-      Harbor robot login (`/etc/containers/auth.json`) and the first deploy.
-- [ ] Network-team ACL: inbound 443 from the internet to .21.
-- [ ] `/etc/phantasos/phantasos.env` (mode 600), placed by hand from `deploy/phantasos.env.example`; fresh APP_SECRET.
+- [x] Network-team ACL .21 → Harbor .6:443 (open 2026-11-08).
+- [ ] Harbor robot login on .21 (`/etc/containers/auth.json`), cluster side; then deploys can drop `--load`.
+- [x] Network-team ACL: inbound 443 from the internet to .21 (open 2026-11-08).
+- [x] `/etc/phantasos/phantasos.env` (mode 600), placed by hand from `deploy/phantasos.env.example`; fresh APP_SECRET.
 - [ ] Production Google OAuth redirect URIs for both hosts.
 - [x] DB connectivity verified 2026-11-07: from .21 (TLS 1.3, cert verified, `pg_hba` allows .21, SCRAM login) and from the
       app image (PHP 8.4 / Alpine libpq, `sslmode=verify-full&sslrootcert=system`).

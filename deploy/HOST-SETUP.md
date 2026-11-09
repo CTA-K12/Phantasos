@@ -23,12 +23,13 @@ The host side is built (k8s-cluster repo, `docs/07`, role `phantasos_host`). As 
   and the SCRAM login works. The app image connects with `sslmode=verify-full&sslrootcert=system`.
 
 Still open:
-- [ ] **Network-team ACL: .21 → Harbor (.6:443).** Requested 2026-10-27; still timing out as of
-      2026-11-07. This blocks the Harbor robot login (`/etc/containers/auth.json`) and the first
-      deploy.
-- [ ] **Network-team ACL: inbound 443 from the internet to .21**, needed before testing.
-- [ ] `/etc/phantasos/phantasos.env`: placed by hand from `deploy/phantasos.env.example`.
-- [ ] Media copy (§6), which waits on `/media` backups and auditd.
+- [x] **Network-team ACL: .21 → Harbor (.6:443).** Open 2026-11-08 (`/v2/` answers 401 from .21).
+- [ ] Harbor robot login (`/etc/containers/auth.json`); until then deploy with `bin/deploy.sh --load`.
+- [x] **Network-team ACL: inbound 443 from the internet to .21.** Open 2026-11-08: internet
+      scanners reach nginx, and the old server's subnet (198.236.68.0/24, where the consumer apps'
+      kube nodes .83/.84 are) completes a TLS 1.2 handshake.
+- [x] `/etc/phantasos/phantasos.env`: placed by hand from `deploy/phantasos.env.example`.
+- [x] Initial media copy (§6), 2026-11-07; the final pass is in `CUTOVER.md`.
 - [ ] `/media` backups (§7), auditd, monitoring (§8).
 
 ## What runs here
@@ -185,14 +186,14 @@ remove the key after cutover.
 
 - [x] `/media` is LUKS-encrypted, unlocks unattended at reboot (test one), and its recovery key is in Vault
 - [x] `/media/phantasos` and `/media/.upload-tmp` exist with the ownership and modes above, labelled `container_file_t`
-- [ ] Podman is installed; `podman pull` of an `appdev-phi` image works as root (blocked: Harbor ACL)
+- [ ] Podman is installed; `podman pull` of an `appdev-phi` image works as root (ACL open 2026-11-08; needs the robot login)
 - [x] The certificate for both names is in `/etc/phantasos/tls/`, and the renewal hook is installed
-- [ ] `/etc/phantasos/phantasos.env` is in place (0600)
+- [x] `/etc/phantasos/phantasos.env` is in place (0600)
 - [ ] The production OAuth redirect URIs are registered
 - [x] `pg_hba` allows .21 (verified 2026-11-07). Test from .21:
       `psql 'host=appdev-pg-prod.apps.cascadetech.org dbname=phantasos user=phantasos sslmode=verify-full sslrootcert=system' -c 'select 1'`
-- [ ] Outbound to Harbor, Google and `ortrac.mesd.k12.or.us:80` works
-- [ ] The network-team ACL for inbound 443 is requested (it can go live just before testing)
+- [x] Outbound to Harbor, Google and `ortrac.mesd.k12.or.us:80` works (Harbor since 2026-11-08)
+- [x] The network-team ACL for inbound 443 is open (2026-11-08)
 - [ ] The `/media` backup job and monitoring targets are set up
 
 ## Open questions
