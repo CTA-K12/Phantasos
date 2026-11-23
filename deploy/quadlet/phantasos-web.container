@@ -11,12 +11,15 @@
 # After=luks-unlock-media.service and REGISTRY_AUTH_FILE. Don't duplicate those here.
 [Unit]
 Description=Phantasos nginx
-Requires=phantasos-app.service phantasos-worker.service
+# Wants, not Requires, for the worker: it exits hourly (--time-limit) and Requires would stop
+# and restart nginx with it, cutting streams and downloads in progress.
+Requires=phantasos-app.service
+Wants=phantasos-worker.service
 After=phantasos-app.service
 
 [Container]
 ContainerName=phantasos-web
-Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-web:v1.0.3
+Image=appdev-registry.apps.cascadetech.org/appdev-phi/phantasos-web:v1.0.4
 Network=phantasos.network
 PublishPort=443:8443
 # Read-only: nginx only reads files PHP has authorised via X-Accel-Redirect.

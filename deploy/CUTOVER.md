@@ -4,9 +4,14 @@ Moves `phantasos.mesd.k12.or.us` from the legacy server (198.236.68.237) to the 
 (`phantasos.apps.cascadetech.org`, 198.236.76.21). Host prerequisites: `deploy/HOST-SETUP.md`.
 Background: `AI.md` §13–14.
 
-Expected downtime: about 15 minutes, from stopping the old Apache to the DNS change. During that
-window uploads and downloads fail. Consumers don't change anything: the URLs, keys and media IDs
-stay the same.
+**Plan as of 2026-11-21: switch the apps, not DNS.** A DNS change can't be guaranteed on a weekend,
+so each consumer is republished with `MEDIASERVER_HOST=https://phantasos.apps.cascadetech.org` (§2
+step 5). Keys and media IDs stay the same, and the apps read the host at runtime, so nothing stored
+needs rewriting. Pointing `phantasos.mesd.k12.or.us` at .21 follows later as a safety net (§4).
+
+Expected downtime: about an hour, from stopping the old Apache until the apps are republished.
+During that window uploads and downloads fail. Apps must not switch before the final import
+(step 4): it replaces each client's media, so uploads made on the new host before it are lost.
 
 ## 1. Before cutover day
 
@@ -24,14 +29,14 @@ re-import replaces each client's media rows, and the final sync with `--delete` 
 - [ ] Network-team ACL for inbound 443 is open, and the API answers from outside the network.
 - [ ] Production Google OAuth redirect URI for `phantasos.mesd.k12.or.us` is registered.
 
-**DNS prep (at least 24 h ahead).** The name is split-horizon:
+**DNS (for the later change in §4, not needed on cutover day).** The name is split-horizon:
 
 | View | Where | Today |
 |---|---|---|
 | Public | Route53 (`mesd.k12.or.us` zone) | A 198.236.68.237, TTL 3600 |
 | Internal | MESD DNS (`dns1i`/`dns2i`) | A 198.236.68.237, TTL 86400 |
 
-- [ ] Lower both TTLs to 300, at least 24 h before the window (the internal one is 24 h today).
+- [ ] Optional: lower both TTLs to 300 a day before the change, so a mistake is quick to undo.
 - [ ] Confirm internal clients (SubDocs on `ortrac`, the HealthEd and Training servers) can reach
       198.236.76.21:443. The internet ACL doesn't cover internal paths.
 - [ ] Tell the consumer teams the window.
@@ -73,16 +78,22 @@ management dashboard.
    cd migration && ../.venv/bin/python import_to_pg.py --target prod --apply
    cd migration && ../.venv/bin/python verify_media_copy.py                     # must say OK
    ```
-5. **Flip DNS:** set `phantasos.mesd.k12.or.us` A → 198.236.76.21 in **both** Route53 and the
-   internal MESD DNS.
-6. **Check from outside and inside:**
-   ```
-   curl -sS -o /dev/null -w '%{http_code} %{remote_ip}\n' -H 'X-Api-Key: x' \
-     'https://phantasos.mesd.k12.or.us/api/mediaInfo?media_id=000000000000000000000000'   # 403 198.236.76.21
-   ```
+5. **Switch the apps:** set `MEDIASERVER_HOST: "https://phantasos.apps.cascadetech.org"` in each
+   php-env configmap, apply it, and restart the php pods. All API calls come from the app pods
+   (old kube nodes 198.236.68.83/.84), never from browsers, apart from uploads to the
+   `upload_route` the ticket returns, which already names the new host.
+   - training-api: `training-api`, `training-demo-api`
+   - healthed-api: `healthed-api`, `healthed-nwresd-api`, `healthed-demo-api`
+   - healthed-training: `healthed-api`, `healthed-nwresd-api`, `healthed-demo-api`, `healthed-qa`,
+     `healthed-nwresd-qa` (whichever are deployed)
+   - SubDocs (config not in this workspace)
+   - DocGuard (`docguard-api-php-env`): it's off and only runs on demand, but switch it now so it
+     works the next time it's turned on.
+6. **Check:** each app's API traffic shows up in `journalctl -u phantasos-web` on .21, and its
+   upload and playback work.
 
 **Go/no-go:** if steps 3–4 don't verify, start the old Apache again (`systemctl start httpd`)
-before touching DNS. Nothing has changed for consumers yet.
+before switching any app. Nothing has changed for consumers yet.
 
 ## 3. First hour
 
@@ -94,13 +105,13 @@ before touching DNS. Nothing has changed for consumers yet.
 - [ ] No 5xx in `journalctl -u phantasos-web`, and no PHP errors in `journalctl -u phantasos-app`.
 - [ ] Watch for 403s from consumers. That would mean a key-mapping problem in the import.
 
-**Rollback (first hour only):** point both DNS records back to 198.236.68.237 and start the old
-Apache. Anything uploaded to the new host after the flip is not on the old server and is lost to
+**Rollback (first hour only):** set the apps' `MEDIASERVER_HOST` back and start the old Apache. Anything uploaded to the new host after the flip is not on the old server and is lost to
 consumers, so roll back only for a fault that blocks consumers.
 
 ## 4. After
 
-- [ ] Raise the DNS TTLs back.
+- [ ] Point `phantasos.mesd.k12.or.us` at 198.236.76.21 in both Route53 and the internal MESD DNS,
+      so anything still using the old name keeps working. The certificate already covers it.
 - [ ] Remove the push key from .21 (`authorized_keys`). It lives on the vulnerable server.
 - [ ] Keep the old server powered off but intact for 30 days, then decommission it, along with the
       MD3200i, appdev-video1/2/3 and RabbitMQ.
