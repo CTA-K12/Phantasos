@@ -9,7 +9,8 @@ see its own media.
 
 ## API
 
-All endpoints live under `https://phantasos.mesd.k12.or.us/api/`. Send the key as an `X-Api-Key`
+All endpoints live under `https://phantasos.apps.cascadetech.org/api/` (since the 2026-11-21 cutover;
+`phantasos.mesd.k12.or.us` serves the same API once its DNS points at the new host). Send the key as an `X-Api-Key`
 header (preferred) or, for existing integrations, as the `apikey` query parameter.
 
 | Endpoint | Method | Auth | Purpose |
@@ -29,6 +30,7 @@ video (MP4, MOV, WebM, AVI, MKV, WMV, FLV, 3GP, MPEG, Ogg).
 Requires PHP 8.4+, Composer, Docker (for PostgreSQL) and ffmpeg.
 
 ```bash
+cp .env.example .env                            # then set APP_SECRET (see the file)
 docker compose -f docker-compose-dev-db.yml up -d
 composer install
 php bin/console doctrine:migrations:migrate -n
@@ -38,6 +40,14 @@ APP_ENV=test php bin/console doctrine:fixtures:load -n
 composer test && composer test:stan
 symfony serve                                   # API + admin UI
 php bin/console messenger:consume async -vv     # worker
+```
+
+To sign in to the admin site locally, create yourself a user and either set up Google OAuth
+credentials in `.env.local` or use the dev login (`APP_DEV_AUTH_ENABLED=true` in `.env.local`, then
+open `/dev-login`):
+
+```bash
+php bin/console app:user:create you@mesd.k12.or.us --role=ROLE_ADMIN
 ```
 
 `CLAUDE.md` has the conventions, and `AI.md` has the architecture, history and decisions.
