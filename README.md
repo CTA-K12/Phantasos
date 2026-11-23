@@ -50,5 +50,7 @@ open `/dev-login`):
 php bin/console app:user:create you@mesd.k12.or.us --role=ROLE_ADMIN
 ```
 
+Apps integrating with Phantasos: use the reference client and guide in `client/` (`client/README.md`).
+
 `CLAUDE.md` has the conventions, and `AI.md` has the architecture, history and decisions.
 Deployment (Podman Quadlet on `phantasos.apps.cascadetech.org`) is in `deploy/`.

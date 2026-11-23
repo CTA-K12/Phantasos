@@ -5,6 +5,7 @@ parameters:
     level: 8
     paths:
         - src
+        - client/src
 
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml

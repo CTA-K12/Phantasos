@@ -85,6 +85,8 @@ Open:
 - [x] `bin/deploy.sh`: build, ship (Harbor, or `--load` over SSH), install units, restart, migrate, smoke test; `--rollback`.
 - [ ] Trivy scan clean (Harbor scans on push).
 - [ ] Retention for `audit_log` (`media.served` ≈ 7k rows/day) and `messenger_messages` failed queue.
+- [ ] Retention screen for media: PHI kept 96 months (decided 2026-11-22), per-client policy, purge
+      with audit. Not urgent: no PHI media is near the limit yet.
 - [ ] Monitoring: worker liveness, failed-message count, disk usage on /media.
 
 ## Host & cutover (phantasos.apps.cascadetech.org, .21)
@@ -130,9 +132,11 @@ Test on `phantasos.apps.cascadetech.org` (test writes are disposable), then cuto
 
 ## HIPAA / ePHI (before ORMed onboarding)
 - [x] Storage decision: local storage on the Rocky box (AI.md §11).
-- [ ] LUKS on `/media` + encrypted backups; PG already pg_tde.
-- [ ] Tenancy decision for ORMed (dedicated instance vs multi-tenant).
-- [ ] ORMed key under its final name; ORMed proxies media server-side.
+- [x] LUKS on `/media` + encrypted backups; PG already pg_tde.
+- [x] Tenancy: one shared instance for PHI and non-PHI apps (decided 2026-11-22, AI.md §11).
+- [ ] Reference client + integration guide (`client/`) for ACCESS and ORMed2.
+- [ ] ORMed key under its final name, one client per environment; ORMed proxies media server-side.
+- [ ] ACCESS key, one client per environment.
 - [ ] Availability: tested restore; risk assessment sign-off.
 
 ## Backlog / nice-to-have

@@ -60,7 +60,15 @@ migration/                             Python tooling (own venv at .venv): legac
                                        capture_contract.py, import_to_pg.py, parity_check.py
 tests/Contract/                        legacy contract replay (fixtures/legacy/*.json)
 deploy/                                Quadlet units, compose file, env template, HOST-SETUP.md, CUTOVER.md
+client/                                reference PHP client + integration guide for consuming apps (App\Phantasos,
+                                       autoload-dev; tested in tests/Client/, incl. against this API)
 ```
+
+## Consumer client (`client/`)
+
+New consumers (ACCESS, ORMed2) copy `client/src/` into their app; `client/README.md` is their guide.
+It is part of the public contract: if you change the API or a processor's MIME list, update the
+client and keep `tests/Client/` passing (`AcceptedTypesTest` fails when the type lists drift).
 
 ## Adding a processor
 

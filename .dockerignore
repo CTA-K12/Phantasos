@@ -9,6 +9,7 @@ migration/
 vendor/
 var/
 tests/
+client/
 node_modules/
 .phpunit.cache/
 .claude/

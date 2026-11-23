@@ -11,9 +11,11 @@ learn things — it is the "what is true about this system" doc. Actionable work
 >   **WireGuard**-tunneled NFS *(only if API/workers run in k8s — see OPEN QUESTION below)*.
 > - **phantasos VM sheds the DB role** → becomes media-store + app/API host. DB lives on Percona PG.
 > - ePHI app **ORMed** (being rebuilt) onboards later as a brand-new key; `ORMed Training` ≠ ePHI.
-> - **OPEN:** do the Phantasos **API + queue workers run on the phantasos VM (local /media)** or **in
->   k8s (needs NFS+WireGuard)**? Determines whether the storage-encryption design is even needed.
-> - **OPEN:** ePHI in a **dedicated PG instance/db** vs. shared `pg-prod` (HIPAA segmentation).
+> - ~~OPEN: API + workers on the VM or in k8s?~~ **Resolved:** they run on the phantasos VM (Podman
+>   Quadlet, local `/media`), so the NFS/WireGuard design is not needed (§14).
+> - ~~OPEN: dedicated instance for ePHI?~~ **Decided 2026-11-22: one shared instance** for PHI and
+>   non-PHI apps (§11). Public API access stays for now.
+> - New consumers (ACCESS, ORMed2) integrate with the reference client in `client/`.
 
 ---
 
@@ -353,6 +355,18 @@ Mongo also on the Rocky box (or its own VM) per the dedicated-DB preference.
 - **App hardening before ePHI**: CORS `*`, API-key model, `unserialize()` queue payload (see §8).
 - **Sign-off**: security/compliance officer must own the HIPAA risk assessment (esp. in-transit
   method + tenancy decision).
+
+### Decisions 2026-11-22: shared instance, public API, retention
+- **One shared Phantasos instance for PHI and non-PHI apps.** The same HIPAA-trained team supports
+  all of them, and the instance meets the controls: LUKS on `/media`, TLS in transit, pg_tde on the
+  database, encrypted file and database backups, per-client key isolation on every read, and an
+  audit trail with an admin UI (`media.served`, admin views and file opens). This settles the
+  "Tenancy / blast radius" item above.
+- **The API stays publicly reachable.** Legacy consumers upload from end users' browsers, and ORMed
+  itself is public. If every consumer later proxies media server-side, public access to the API can
+  be closed. New consumers proxy server-side from the start (`client/README.md`).
+- **Retention:** PHI media is kept 96 months. A retention screen is still to build; nothing is near
+  96 months old yet.
 
 ### The ePHI app: ORMed (K-12 Student Health System)
 - **ORMed is NOT in Phantasos yet** — it's being rebuilt now; Phantasos support is added "soon."
