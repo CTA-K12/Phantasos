@@ -21,7 +21,7 @@ RUN apk add --no-cache \
         php84 php84-fpm php84-ctype php84-curl php84-dom php84-fileinfo php84-gd \
         php84-iconv php84-intl php84-mbstring php84-opcache php84-openssl \
         php84-pdo php84-pdo_pgsql php84-phar php84-session php84-simplexml \
-        php84-tokenizer php84-xml php84-xmlwriter php84-zip php84-sodium \
+        php84-tokenizer php84-xml php84-xmlwriter php84-zip php84-sodium php84-exif \
         ffmpeg ca-certificates tzdata \
  && ln -sf /usr/bin/php84 /usr/bin/php \
  && rm -f /etc/php84/php-fpm.d/www.conf \

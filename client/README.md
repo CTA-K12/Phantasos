@@ -102,10 +102,14 @@ new Assert\File(maxSize: MediaStore::MAX_SIZE, mimeTypes: MediaStore::ACCEPTED_T
 
 `ACCEPTED_TYPES` (and `IMAGE_TYPES`, `PDF_TYPES`, `AUDIO_TYPES`, `VIDEO_TYPES`) are exactly what
 Phantasos accepts; its tests fail if they drift. Phantasos sniffs the content, not the file name.
-It does **not** accept **GIF, WebP or HEIC** (iPhone photos default to HEIC unless the phone is set to
-"Most Compatible"; photos uploaded through a browser are usually converted to JPEG), nor Word,
-Excel, text, HTML or ZIP files: convert to PDF or JPEG first, or keep those elsewhere. The limit is
+Images include phone photos: JPEG, PNG, GIF, WebP, AVIF, **HEIC/HEIF** (iPhone) and TIFF (scanners;
+first page only). Renditions come out upright and carry no metadata; the **original is stored unchanged,
+including any location the phone recorded**. Phantasos does **not** accept SVG,
+Word, Excel, text, HTML or ZIP files: convert to PDF first, or keep those elsewhere. The limit is
 1 GB per file. Phantasos doesn't store the original file name, so keep it on your own entity.
+
+**Originals of HEIC, TIFF and AVIF** can't be shown by every browser (Chrome can't show HEIC). Show
+the PNG renditions (`large.png` is 1024×768) and offer the original as a download.
 
 The upload returns once the file is stored. Renditions follow in the background (seconds for
 images, minutes for long videos). Pass a `$callbackUrl` only if you must react the moment
@@ -155,7 +159,7 @@ for small files.
 
 | Type | Files |
 |---|---|
-| image (JPEG, PNG, BMP) | `original.*`, `thumbnail.png` (75×75), `small.png` (320×240), `medium.png` (640×480), `large.png` (1024×768) |
+| image (JPEG, PNG, GIF, WebP, AVIF, HEIC, TIFF, BMP) | `original.*`, `thumbnail.png` (75×75), `small.png` (320×240), `medium.png` (640×480), `large.png` (1024×768) |
 | pdf | `original.pdf` |
 | audio | `original.*`, `low.mp3` (64 kbps), `high.mp3` (192 kbps) |
 | video | `original.*`, `small-frame.png`, `small.mp4` (640×360), `large-frame.png`, `large.mp4` (1280×720) |

@@ -22,7 +22,7 @@ header (preferred) or, for existing integrations, as the `apikey` query paramete
 
 When processing finishes, Phantasos POSTs `media_id` to `callback_route` if one was given.
 
-Supported uploads: images (JPEG, PNG, BMP, XBM/XPM), PDF, audio (MP3, M4A, Ogg, FLAC, WAV, WebM) and
+Supported uploads: images (JPEG, PNG, GIF, WebP, AVIF, HEIC/HEIF, TIFF, BMP, XBM/XPM), PDF, audio (MP3, M4A, Ogg, FLAC, WAV, WebM) and
 video (MP4, MOV, WebM, AVI, MKV, WMV, FLV, 3GP, MPEG, Ogg).
 
 ## Development

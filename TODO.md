@@ -85,6 +85,11 @@ Open:
 - [x] `bin/deploy.sh`: build, ship (Harbor, or `--load` over SSH), install units, restart, migrate, smoke test; `--rollback`.
 - [ ] Trivy scan clean (Harbor scans on push).
 - [ ] Retention for `audit_log` (`media.served` ≈ 7k rows/day) and `messenger_messages` failed queue.
+- [x] Phase A image types (2026-11-22): GIF, WebP, AVIF, HEIC/HEIF, TIFF; JPEG EXIF orientation; `php84-exif`.
+- [ ] Phase B: per-client allowed type groups; ClamAV scan of every upload; download-only DOCX/XLSX/PPTX
+      (no macros, no legacy .doc/.xls).
+- [ ] Phase C: LibreOffice `preview.pdf` for Office files (isolated container); PDF first-page thumbnails.
+- [ ] Decide: strip location (GPS) metadata from photo originals at upload (renditions already carry none).
 - [ ] Retention screen for media: PHI kept 96 months (decided 2026-11-22), per-client policy, purge
       with audit. Not urgent: no PHI media is near the limit yet.
 - [ ] Monitoring: worker liveness, failed-message count, disk usage on /media.

@@ -14,12 +14,13 @@ interface MediaStore
 {
     /*
      * The file types Phantasos accepts (it sniffs the content, not the name). Anything else is
-     * rejected, including GIF, WebP, HEIC (iPhone photos), Word, Excel, text and HTML. Use
-     * ACCEPTED_TYPES in a File constraint to reject early. Phantasos's tests keep these in step
-     * with its processors.
+     * rejected, including SVG, Word, Excel, text and HTML. Use ACCEPTED_TYPES in a File constraint
+     * to reject early. Phantasos's tests keep these in step with its processors.
      */
     public const IMAGE_TYPES = [
-        'image/jpeg', 'image/pjpeg', 'image/png', 'image/bmp', 'image/x-windows-bmp', 'image/x-ms-bmp',
+        'image/jpeg', 'image/pjpeg', 'image/png', 'image/gif', 'image/webp', 'image/avif',
+        'image/heic', 'image/heif', 'image/tiff',
+        'image/bmp', 'image/x-windows-bmp', 'image/x-ms-bmp',
         'image/x-xbitmap', 'image/x-xbm', 'image/xbm', 'image/xpm', 'image/x-xpixmap',
     ];
     public const PDF_TYPES = ['application/pdf', 'application/x-pdf'];

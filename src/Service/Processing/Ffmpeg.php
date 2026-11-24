@@ -40,6 +40,47 @@ class Ffmpeg
     }
 
     /**
+     * Decodes a still image GD can't read (HEIC/HEIF, TIFF) to PNG: the primary image of a HEIC
+     * (tile grids reassembled), the first page of a TIFF, with the file's rotation applied.
+     * Large images are scaled to fit $maxSide, which is plenty for the renditions and keeps a
+     * 48-megapixel phone photo from filling the worker's memory in GD.
+     */
+    public function decodeImage(string $input, string $output, int $maxSide = 2048): void
+    {
+        $this->stillToPng($input, $output, []);
+
+        // HEIC tile grids are assembled by ffmpeg's own filter graph, which can't take a scale
+        // filter as well, so large images are scaled in a second pass over the PNG.
+        $size = @getimagesize($output);
+        if (is_array($size) && max($size[0], $size[1]) > $maxSide) {
+            $scaled = $output . '.scaled.png';
+            try {
+                $this->stillToPng($output, $scaled, [
+                    '-vf', sprintf("scale='min(%1\$d,iw)':'min(%1\$d,ih)':force_original_aspect_ratio=decrease", $maxSide),
+                ]);
+                rename($scaled, $output);
+            } finally {
+                @unlink($scaled);
+            }
+        }
+    }
+
+    /** @param list<string> $filters */
+    private function stillToPng(string $input, string $output, array $filters): void
+    {
+        $process = new Process([
+            $this->ffmpegBinary, '-hide_banner', '-nostdin', '-loglevel', 'error', '-y',
+            '-i', $input,
+            '-frames:v', '1', '-update', '1',
+            ...$filters,
+            '-f', 'image2', '-c:v', 'png',
+            $output,
+        ]);
+        $process->setTimeout(300);
+        $process->mustRun();
+    }
+
+    /**
      * Runs one encode. $onProgress receives 0–100 based on ffmpeg's -progress output.
      *
      * @param list<string>          $args       everything after the input file
